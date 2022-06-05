@@ -18,8 +18,11 @@ var deleteKrug = require("./KrugList/deleteKrug");
 var changeKrugTitle = require("./KrugList/changeKrugTitle");
 var getAllKrugs = require("./KrugList/getAllKrugs");
 
-var getEng = require("./EngList/getEng");
-var changeEngKrug = require("./EngList/changeEngKrug");
+var getEng = require("./BRIGList/getEng");
+var changeBrigKrug = require("./BRIGList/changeBrigKrug");
+var addBrig = require("./BRIGList/addBrig");
+var getBrig = require("./BRIGList/getBrig");
+var deleteBrig = require("./BRIGList/deleteBrig");
 
 module.exports = [
   getAPV,
@@ -33,5 +36,8 @@ module.exports = [
   getAllKrugs,
   changeApvKrug,
   getEng,
-  changeEngKrug,
+  changeBrigKrug,
+  addBrig,
+  getBrig,
+  deleteBrig,
 ];

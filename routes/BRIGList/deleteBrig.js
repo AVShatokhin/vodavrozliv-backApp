@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 /* GET home page. */
-router.post("/changeEngKrug", async function (req, res, next) {
+router.post("/deleteBrig", async function (req, res, next) {
   if (
     !(
       req.session.isSession == true &&
@@ -15,24 +15,7 @@ router.post("/changeEngKrug", async function (req, res, next) {
   }
 
   await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.changeEngKrug, [
-      0,
-      req.body.oldActiveKrug,
-    ])
-    .then(
-      (result) => {},
-      (err) => {
-        res.error("SQL", err);
-        console.log(err);
-        return;
-      }
-    );
-
-  await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.changeEngKrug, [
-      req.body.eng_uid,
-      req.body.newActiveKrug,
-    ])
+    .asyncQuery(req.mysqlConnection.SQL_APP.deleteBrig, [req.body.brig_id])
     .then(
       (result) => {
         res.ok();
