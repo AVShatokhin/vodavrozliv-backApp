@@ -30,6 +30,8 @@ router.get("/getBrig", async function (req, res, next) {
     .asyncQuery(req.mysqlConnection.SQL_APP.getBrigCount, [
       searchQuery,
       searchQuery,
+      searchQuery,
+      searchQuery,
     ])
     .then(
       (result) => {
@@ -46,12 +48,15 @@ router.get("/getBrig", async function (req, res, next) {
     .asyncQuery(req.mysqlConnection.SQL_APP.getBrig, [
       searchQuery,
       searchQuery,
+      searchQuery,
+      searchQuery,
       currentPage * perPage,
       perPage,
     ])
     .then(
       async (result) => {
         result.forEach((element) => {
+          element.brigMembers = JSON.parse(element.brigMembers);
           data.items[element.brig_id] = element;
         });
 

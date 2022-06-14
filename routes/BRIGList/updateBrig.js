@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 /* GET home page. */
-router.post("/addBrig", async function (req, res, next) {
+router.post("/updateBrig", async function (req, res, next) {
   if (
     !(
       req.session.isSession == true &&
@@ -15,11 +15,12 @@ router.post("/addBrig", async function (req, res, next) {
   }
 
   await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.addBrig, [
+    .asyncQuery(req.mysqlConnection.SQL_APP.updateBrig, [
       req.body.brigName,
       req.body.brigCar,
       req.body.brigKey,
       req.body.brigPhone,
+      req.body.brig_id,
     ])
     .then(
       (result) => {
@@ -28,6 +29,7 @@ router.post("/addBrig", async function (req, res, next) {
       (err) => {
         res.error("SQL", err);
         console.log(err);
+        return;
       }
     );
 });

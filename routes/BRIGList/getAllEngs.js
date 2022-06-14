@@ -1,8 +1,11 @@
 var express = require("express");
 var router = express.Router();
 
+const MAX_PAGE_SIZE = 50;
+const START_PAGE = 0;
+
 /* GET home page. */
-router.post("/addBrig", async function (req, res, next) {
+router.get("/getAllEngs", async function (req, res, next) {
   if (
     !(
       req.session.isSession == true &&
@@ -14,15 +17,20 @@ router.post("/addBrig", async function (req, res, next) {
     return;
   }
 
+  let data = {
+    queryLength: 0,
+    items: {},
+  };
+
   await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.addBrig, [
-      req.body.brigName,
-      req.body.brigCar,
-      req.body.brigKey,
-      req.body.brigPhone,
-    ])
+    .asyncQuery(req.mysqlConnection.SQL_APP.getAllEngs, ["ENGINEER"])
     .then(
-      (result) => {
+      async (result) => {
+        result.forEach((element) => {
+          element.extended = JSON.parse(element.extended);
+        });
+
+        res.result.data = result;
         res.ok();
       },
       (err) => {
