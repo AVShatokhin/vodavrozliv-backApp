@@ -1,11 +1,8 @@
 var express = require("express");
 var router = express.Router();
 
-const MAX_PAGE_SIZE = 50;
-const START_PAGE = 0;
-
 /* GET home page. */
-router.post("/addAPV", async function (req, res, next) {
+router.post("/updateApvOptions", async function (req, res, next) {
   if (
     !(
       req.session.isSession == true &&
@@ -18,11 +15,11 @@ router.post("/addAPV", async function (req, res, next) {
   }
 
   await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.addAPV, [
-      req.body.sn,
+    .asyncQuery(req.mysqlConnection.SQL_APP.updateApvOptions, [
       req.body.address,
       req.body.tgLink,
       req.body.snEQ,
+      req.body.sn,
     ])
     .then(
       (result) => {

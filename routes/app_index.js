@@ -9,7 +9,7 @@ indexRouter.get("/app/", function (req, res, next) {
 var getAPV = require("./APVList/getAPV");
 var addAPV = require("./APVList/addAPV");
 var deleteAPV = require("./APVList/deleteAPV");
-var changeAddress = require("./APVList/changeAddress");
+var updateApvOptions = require("./APVList/updateApvOptions");
 var changeApvKrug = require("./APVList/changeApvKrug");
 
 var getKrug = require("./KrugList/getKrug");
@@ -27,11 +27,14 @@ var addEngToBrig = require("./BRIGList/addEngToBrig");
 var deleteEngFromBrig = require("./BRIGList/deleteEngFromBrig");
 var updateBrig = require("./BRIGList/updateBrig");
 
+var getInkas = require("./InkasJou/getInkas");
+var getMain = require("./MainJou/getMain");
+
 module.exports = [
   getAPV,
   addAPV,
   deleteAPV,
-  changeAddress,
+  updateApvOptions,
   getKrug,
   addKrug,
   deleteKrug,
@@ -46,4 +49,6 @@ module.exports = [
   addEngToBrig,
   deleteEngFromBrig,
   updateBrig,
+  getInkas,
+  getMain,
 ];

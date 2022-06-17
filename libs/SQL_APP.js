@@ -1,11 +1,12 @@
 module.exports = (config) => {
   return {
     Test: `SELECT test from test`,
-    getAPV: `SELECT sn, address, activeKrug from apv WHERE sn like CONCAT('%',?,'%') or address like CONCAT('%',?,'%') order by sn LIMIT ?, ?`,
-    getAPVCount: `SELECT count(*) as queryLength from apv WHERE sn like CONCAT('%',?,'%') or address like CONCAT('%',?,'%')`,
-    addAPV: `INSERT into apv set sn=?, address=?`,
+    getAPV: `SELECT sn, address, activeKrug, tgLink, snEQ, cost, phone, version, linkState, oper, lts from apv WHERE sn like CONCAT('%',?,'%') or address like CONCAT('%',?,'%') or oper like CONCAT('%',?,'%') or phone like CONCAT('%',?,'%') or snEQ like CONCAT('%',?,'%') order by sn LIMIT ?, ?`,
+    getAPVCount: `SELECT count(*) as queryLength from apv WHERE sn like CONCAT('%',?,'%') or address like CONCAT('%',?,'%') or phone like CONCAT('%',?,'%') or oper like CONCAT('%',?,'%') or snEQ like CONCAT('%',?,'%')`,
+    getAllAPV: `SELECT sn, address, activeKrug from apv`,
+    addAPV: `INSERT into apv set sn=?, address=?, tgLink=?, snEQ=?`,
     deleteAPV: `DELETE from apv where sn=?`,
-    changeAddress: `UPDATE apv set address=? where sn=?`,
+    updateApvOptions: `UPDATE apv set address=?, tgLink=?, snEQ=? where sn=?`,
     changeApvKrug: `UPDATE apv set activeKrug=? where sn=?`,
     addKrug: `INSERT into krug set title=?`,
     getKrug: `SELECT krug_id, title, brig_id FROM krug WHERE title like CONCAT('%',?,'%') LIMIT ?, ?`,
@@ -14,8 +15,6 @@ module.exports = (config) => {
     deleteKrug: `DELETE from krug WHERE krug_id=?`,
     changeKrugTitle: `UPDATE krug SET title=? where krug_id=?`,
     getAllEngs: `SELECT uid, extended, email  FROM ${config.db_prefix}_users WHERE roles like CONCAT('%',?,'%') order by uid`,
-    //getEng: `SELECT uid, extended, email  FROM ${config.db_prefix}_users WHERE roles like CONCAT('%',?,'%') and (extended like CONCAT('%',?,'%') or email like CONCAT('%',?,'%')) order by uid LIMIT ?, ?`,
-    //getEngCount: `SELECT count(*) as queryLength FROM ${config.db_prefix}_users WHERE roles like CONCAT('%',?,'%') and (extended like CONCAT('%',?,'%') or email like CONCAT('%',?,'%'))`,
     changeBrigKrug: `UPDATE krug set brig_id=? where krug_id=?`,
     addBrig: `INSERT INTO brig set brigName=?, brigCar=?, brigKey=?, brigPhone=?`,
     getBrig: `SELECT brig_id, brigName, brigCar, brigMembers, brigKey, brigPhone FROM brig WHERE brigName like CONCAT('%',?,'%') or brigCar like CONCAT('%',?,'%') or brigKey like CONCAT('%',?,'%') or brigPhone like CONCAT('%',?,'%') order by brig_id LIMIT ?, ?`,
@@ -24,5 +23,9 @@ module.exports = (config) => {
     getBrigMembers: `SELECT brigMembers from brig where brig_id=?`,
     updateMembersInBrig: `UPDATE brig SET brigMembers=? where brig_id=?`,
     updateBrig: `UPDATE brig SET brigName=?, brigCar=?, brigKey=?, brigPhone=? where brig_id=?`,
+    getInkas: `SELECT inkas_id, sn, inkas_number, lts, date, version, inkas, kup, box, op, op_extended, op_state, rd, address, krug_name from inkas order by lts desc LIMIT ?, ?`,
+    getInkasCount: `SELECT count(*) as queryLength from inkas`,
+    getMain: `SELECT sn, version, lts, FLAG_start, w, k, r, m, m1, m2, m5, m10, c, errorDevice, errorCode, messCode, FLAG_k_off, FLAG_m_off, FLAG_c_off, FLAG_r_off, FLAG_error_m1, FLAG_error_m2, FLAG_error_m5, FLAG_error_m10, v1, v2, v3, v4 from main order by lts desc LIMIT ?, ?`,
+    getMainCount: `SELECT count(*) as queryLength from main`,
   };
 };
