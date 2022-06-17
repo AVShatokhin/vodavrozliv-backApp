@@ -26,6 +26,8 @@ router.post("/addEngToBrig", async function (req, res, next) {
           if (brigMembers.findIndex((e) => e == eng_uid) == -1) {
             brigMembers.push(eng_uid);
             updateMembersInBrig(req, res, brig_id, brigMembers);
+          } else {
+            res.ok();
           }
         } else {
           res.ok();
