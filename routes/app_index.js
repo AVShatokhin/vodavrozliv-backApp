@@ -11,6 +11,7 @@ var addAPV = require("./APVList/addAPV");
 var deleteAPV = require("./APVList/deleteAPV");
 var updateApvOptions = require("./APVList/updateApvOptions");
 var changeApvKrug = require("./APVList/changeApvKrug");
+var checkTelegram = require("./APVList/checkTelegram");
 
 var getKrug = require("./KrugList/getKrug");
 var addKrug = require("./KrugList/addKrug");
@@ -30,11 +31,35 @@ var updateBrig = require("./BRIGList/updateBrig");
 var getInkas = require("./InkasJou/getInkas");
 var getMain = require("./MainJou/getMain");
 
+var getDevices = require("./MessList/getDevices");
+var getErrors = require("./MessList/getErrors");
+var getMessages = require("./MessList/getMessages");
+var addDevice = require("./MessList/addDevice");
+var addError = require("./MessList/addError");
+var addMessage = require("./MessList/addMessage");
+var deleteDevice = require("./MessList/deleteDevice");
+var deleteError = require("./MessList/deleteError");
+var deleteMessage = require("./MessList/deleteMessage");
+var changeDevice = require("./MessList/changeDevice");
+var changeError = require("./MessList/changeError");
+var changeMessage = require("./MessList/changeMessage");
+var changeIsActiveError = require("./MessList/changeIsActiveError");
+var changeIsActiveMessage = require("./MessList/changeIsActiveMessage");
+
+var getApvByEng = require("./CmdsPanel/getApvByEng");
+var setCmdByEng = require("./CmdsPanel/setCmdByEng");
+var dropCmdByEng = require("./CmdsPanel/dropCmdByEng");
+
+var getApvForInkas = require("./CmdsInkas/getApvForInkas");
+var setCmdInkas = require("./CmdsInkas/setCmdInkas");
+var dropCmdInkas = require("./CmdsInkas/dropCmdInkas");
+
 module.exports = [
   getAPV,
   addAPV,
   deleteAPV,
   updateApvOptions,
+  checkTelegram,
   getKrug,
   addKrug,
   deleteKrug,
@@ -51,4 +76,24 @@ module.exports = [
   updateBrig,
   getInkas,
   getMain,
+  getDevices,
+  getErrors,
+  getMessages,
+  addError,
+  addDevice,
+  addMessage,
+  deleteDevice,
+  deleteError,
+  deleteMessage,
+  changeDevice,
+  changeError,
+  changeMessage,
+  changeIsActiveError,
+  changeIsActiveMessage,
+  getApvByEng,
+  setCmdByEng,
+  dropCmdByEng,
+  getApvForInkas,
+  setCmdInkas,
+  dropCmdInkas,
 ];
