@@ -30,6 +30,7 @@ var updateBrig = require("./BRIGList/updateBrig");
 
 var getInkas = require("./InkasJou/getInkas");
 var getMain = require("./MainJou/getMain");
+var getMainJouFilterStructure = require("./MainJou/getMainJouFilterStructure");
 
 var getDevices = require("./MessList/getDevices");
 var getErrors = require("./MessList/getErrors");
@@ -96,4 +97,5 @@ module.exports = [
   getApvForInkas,
   setCmdInkas,
   dropCmdInkas,
+  getMainJouFilterStructure,
 ];

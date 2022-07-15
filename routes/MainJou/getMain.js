@@ -7,17 +7,14 @@ const START_PAGE = 0;
 /* GET home page. */
 router.get("/getMain", async function (req, res, next) {
   if (
-    !(
-      req.session.isSession == true &&
-      (req.session.userData.roles.includes("DEPUTY") == true ||
-        req.session.userData.roles.includes("HEAD_ANALYSTOP_DEP") == true ||
-        req.session.userData.roles.includes("ACCOUNTANT") == true ||
-        req.session.userData.roles.includes("CASHIER") == true)
-    )
-  ) {
-    res.error("ROLE_ERROR");
+    !req.session.checkRole(req, res, [
+      "HEAD_ANALYSTOP_DEP",
+      "ACCOUNTANT",
+      "CASHIER",
+      "DEPUTY",
+    ])
+  )
     return;
-  }
 
   let data = {
     queryLength: 0,
@@ -29,6 +26,8 @@ router.get("/getMain", async function (req, res, next) {
   let searchQuery = req.query?.searchQuery || "";
   let apv = {};
   let krug = {};
+  let requestData = JSON.parse(req.query.requestData);
+  //console.log(requestData);
 
   await req.mysqlConnection
     .asyncQuery(req.mysqlConnection.SQL_APP.getAllAPV, [])

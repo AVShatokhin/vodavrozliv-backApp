@@ -3,16 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.post("/deleteEngFromBrig", async function (req, res, next) {
-  if (
-    !(
-      req.session.isSession == true &&
-      (req.session.userData.roles.includes("DEPUTY") == true ||
-        req.session.userData.roles.includes("HEAD_OP_DEP") == true)
-    )
-  ) {
-    res.error("ROLE_ERROR");
-    return;
-  }
+  if (!req.session.checkRole(req, res, ["DEPUTY", "HEAD_OP_DEP"])) return;
 
   let brig_id = req.body.brig_id;
   let eng_uid = req.body.eng_uid;

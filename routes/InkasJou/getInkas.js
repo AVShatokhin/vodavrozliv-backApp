@@ -7,17 +7,15 @@ const START_PAGE = 0;
 /* GET home page. */
 router.get("/getInkas", async function (req, res, next) {
   if (
-    !(
-      req.session.isSession == true &&
-      (req.session.userData.roles.includes("DEPUTY") == true ||
-        req.session.userData.roles.includes("HEAD_ANALYSTOP_DEP") == true ||
-        req.session.userData.roles.includes("ACCOUNTANT") == true ||
-        req.session.userData.roles.includes("CASHIER") == true)
-    )
-  ) {
-    res.error("ROLE_ERROR");
+    !req.session.checkRole(req, res, [
+      "ENGINEER",
+      "CASHIER",
+      "ACCOUNTANT",
+      "HEAD_ANALYSTOP_DEP",
+      "DEPUTY",
+    ])
+  )
     return;
-  }
 
   let data = {
     queryLength: 0,

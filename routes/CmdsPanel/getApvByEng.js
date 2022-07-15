@@ -3,15 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get("/getApvByEng", async function (req, res, next) {
-  if (
-    !(
-      req.session.isSession == true &&
-      req.session.userData.roles.includes("ENGINEER") == true
-    )
-  ) {
-    res.error("ROLE_ERROR");
-    return;
-  }
+  if (!req.session.checkRole(req, res, ["ENGINEER"])) return;
 
   await req.mysqlConnection
     .asyncQuery(req.mysqlConnection.SQL_APP.getApvByEng, [

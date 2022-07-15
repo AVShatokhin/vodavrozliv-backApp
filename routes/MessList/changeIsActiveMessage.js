@@ -3,17 +3,8 @@ var router = express.Router();
 
 /* GET home page. */
 router.post("/changeIsActiveMessage", async function (req, res, next) {
-  if (
-    !(
-      req.session.isSession == true &&
-      (req.session.userData.roles.includes("DEPUTY") == true ||
-        req.session.userData.roles.includes("HEAD_OP_DEP") == true ||
-        req.session.userData.roles.includes("PROGRAMMER") == true)
-    )
-  ) {
-    res.error("ROLE_ERROR");
+  if (!req.session.checkRole(req, res, ["DEPUTY", "HEAD_OP_DEP", "PROGRAMMER"]))
     return;
-  }
 
   await req.mysqlConnection
     .asyncQuery(req.mysqlConnection.SQL_APP.changeIsActiveMessage, [
