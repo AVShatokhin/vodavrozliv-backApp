@@ -27,8 +27,8 @@ module.exports = (config) => {
     updateBrig: `UPDATE brig SET brigName=?, brigCar=?, brigKey=?, brigPhone=? where brig_id=?`,
     getInkas: `SELECT dateUnique, inkas_id, sn, inkas_number, lts, date, version, inkas, kup, box, op, op_extended, op_state, rd, address, krug_name from inkas order by lts desc LIMIT ?, ?`,
     getInkasCount: `SELECT count(*) as queryLength from inkas`,
-    getMain: `SELECT sn, version, lts, FLAG_start, w, k, r, m, m1, m2, m5, m10, c, errorDevice, errorCode, messCode, FLAG_k_off, FLAG_m_off, FLAG_c_off, FLAG_r_off, FLAG_error_m1, FLAG_error_m2, FLAG_error_m5, FLAG_error_m10, v1, v2, v3, v4, FLAG_t_off, dv1, dv2, dv3, dv4, dv5, tSOLD, tREMAIN from main order by lts desc LIMIT ?, ?`,
-    getMainCount: `SELECT count(*) as queryLength from main`,
+    getMain,
+    getMainCount,
     getDevices: `SELECT errorDevice, deviceName from device`,
     getErrors: `SELECT errorCode, errorText, isActive from error`,
     getMessages: `SELECT messCode, messText, isActive from message`,
@@ -50,4 +50,39 @@ module.exports = (config) => {
     setCmdInkas: `UPDATE apv SET cmdProfile=? where sn=?`,
     dropCmdInkas: `UPDATE apv SET cmdProfile='{}' where sn=?`,
   };
+};
+
+let getMain = (requestData) => {
+  return `SELECT sn, version, lts, FLAG_start, w, k, r, m, m1, m2, m5, m10, c, errorDevice, errorCode, messCode, FLAG_k_off, FLAG_m_off, FLAG_c_off, FLAG_r_off, FLAG_error_m1, FLAG_error_m2, FLAG_error_m5, FLAG_error_m10, v1, v2, v3, v4, FLAG_t_off, dv1, dv2, dv3, dv4, dv5, tSOLD, tREMAIN from main where ${calcSqlWhereForMain(
+    requestData
+  )} order by lts desc LIMIT ?, ?`;
+};
+
+let getMainCount = (requestData) => {
+  return `SELECT count(*) as queryLength from main where ${calcSqlWhereForMain(
+    requestData
+  )}`;
+};
+
+let calcSqlWhereForMain = (requestData) => {
+  return `${sqlFromArray("sn", requestData.apvs)} and ${sqlFromArray(
+    "errorCode",
+    requestData.errors
+  )} and ${sqlFromArray("errorDevice", requestData.devices)} and ${sqlFromArray(
+    "messCode",
+    requestData.messages
+  )}`;
+};
+
+let sqlFromArray = (column, array) => {
+  let __processingArray = [];
+  if (array?.length > 0) {
+    array.forEach((value) => {
+      __processingArray.push(` ${column}="${value}" `);
+    });
+
+    return "(" + __processingArray.join("or") + ")";
+  } else {
+    return "1";
+  }
 };

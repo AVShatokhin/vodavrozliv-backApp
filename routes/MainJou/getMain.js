@@ -27,7 +27,6 @@ router.get("/getMain", async function (req, res, next) {
   let apv = {};
   let krug = {};
   let requestData = JSON.parse(req.query.requestData);
-  //console.log(requestData);
 
   await req.mysqlConnection
     .asyncQuery(req.mysqlConnection.SQL_APP.getAllAPV, [])
@@ -58,7 +57,7 @@ router.get("/getMain", async function (req, res, next) {
     );
 
   await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getMainCount, [])
+    .asyncQuery(req.mysqlConnection.SQL_APP.getMainCount(requestData), [])
     .then(
       (result) => {
         data.queryLength = result[0].queryLength;
@@ -70,7 +69,7 @@ router.get("/getMain", async function (req, res, next) {
     );
 
   await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getMain, [
+    .asyncQuery(req.mysqlConnection.SQL_APP.getMain(requestData), [
       currentPage * perPage,
       perPage,
     ])
