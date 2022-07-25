@@ -53,13 +53,13 @@ module.exports = (config) => {
 };
 
 let getMain = (requestData) => {
-  return `SELECT sn, version, lts, FLAG_start, w, k, r, m, m1, m2, m5, m10, c, errorDevice, errorCode, messCode, FLAG_k_off, FLAG_m_off, FLAG_c_off, FLAG_r_off, FLAG_error_m1, FLAG_error_m2, FLAG_error_m5, FLAG_error_m10, v1, v2, v3, v4, FLAG_t_off, dv1, dv2, dv3, dv4, dv5, tSOLD, tREMAIN from main where ${calcSqlWhereForMain(
+  return `SELECT sn, version, lts, FLAG_start, w, k, r, m, m1, m2, m5, m10, c, errorDevice, errorCode, messCode, FLAG_k_off, FLAG_m_off, FLAG_c_off, FLAG_r_off, FLAG_error_m1, FLAG_error_m2, FLAG_error_m5, FLAG_error_m10, v1, v2, v3, v4, FLAG_t_off, dv1, dv2, dv3, dv4, dv5, tSOLD, tREMAIN from main where (lts between ? and ?) and ${calcSqlWhereForMain(
     requestData
   )} order by lts desc LIMIT ?, ?`;
 };
 
 let getMainCount = (requestData) => {
-  return `SELECT count(*) as queryLength from main where ${calcSqlWhereForMain(
+  return `SELECT count(*) as queryLength from main where (lts between ? and ?) and ${calcSqlWhereForMain(
     requestData
   )}`;
 };
