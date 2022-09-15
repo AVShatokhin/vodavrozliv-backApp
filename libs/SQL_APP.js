@@ -49,6 +49,8 @@ module.exports = (config) => {
     getApvForInkas: `SELECT krug.title as krugName, sn, cmdProfile, address, activeKrug, tgLink, snEQ, cost, phone, version, linkState, oper, apv.lts as lts from apv, krug where apv.activeKrug=krug.krug_id`,
     setCmdInkas: `UPDATE apv SET cmdProfile=? where sn=?`,
     dropCmdInkas: `UPDATE apv SET cmdProfile='{}' where sn=?`,
+    getReminder: `SELECT value FROM kvs WHERE link=?`,
+    applyReminder: `REPLACE INTO kvs SET link=?, value=?`,
   };
 };
 

@@ -46,6 +46,8 @@ var changeError = require("./MessList/changeError");
 var changeMessage = require("./MessList/changeMessage");
 var changeIsActiveError = require("./MessList/changeIsActiveError");
 var changeIsActiveMessage = require("./MessList/changeIsActiveMessage");
+var getReminder = require("./MessList/getReminder");
+var applyReminder = require("./MessList/applyReminder");
 
 var getApvByEng = require("./CmdsPanel/getApvByEng");
 var setCmdByEng = require("./CmdsPanel/setCmdByEng");
@@ -54,6 +56,8 @@ var dropCmdByEng = require("./CmdsPanel/dropCmdByEng");
 var getApvForInkas = require("./CmdsInkas/getApvForInkas");
 var setCmdInkas = require("./CmdsInkas/setCmdInkas");
 var dropCmdInkas = require("./CmdsInkas/dropCmdInkas");
+
+var getDispatcherMain = require("./DispatcherTable/getDispatcherMain");
 
 module.exports = [
   getAPV,
@@ -98,4 +102,7 @@ module.exports = [
   setCmdInkas,
   dropCmdInkas,
   getMainJouFilterStructure,
+  applyReminder,
+  getReminder,
+  getDispatcherMain,
 ];
