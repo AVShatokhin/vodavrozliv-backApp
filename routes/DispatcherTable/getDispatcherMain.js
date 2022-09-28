@@ -1,183 +1,115 @@
+const e = require("express");
 var express = require("express");
 var router = express.Router();
 
 const MAX_PAGE_SIZE = 50;
 const START_PAGE = 0;
+const SELL_HOURS = 18;
 
 /* GET home page. */
-router.get("/getDispatcherMain", async function (req, res, next) {
-  if (
-    !req.session.checkRole(req, res, [
-      "HEAD_ANALYSTOP_DEP",
-      "ACCOUNTANT",
-      "CASHIER",
-      "DEPUTY",
-    ])
-  )
-    return;
+router.post("/getDispatcherMain", async function (req, res, next) {
+  if (!req.session.checkRole(req, res, ["DISPATCHER"])) return;
+
+  let __requestData = req.body.requestData;
+  let __currentPage = req.body.currentPage || START_PAGE;
+  let __perPage = req.body.perPage || MAX_PAGE_SIZE;
 
   let data = {
     queryLength: 0,
-    items: [],
+    apvs: [],
   };
 
-  let perPage = Number(req.query?.perPage || MAX_PAGE_SIZE);
-  let currentPage = Number(req.query?.currentPage || START_PAGE);
-  let searchQuery = req.query?.searchQuery || "";
-  let apv = {};
-  let krug = {};
-  let brigs = {};
-  let devices = {};
-  let messages = {};
-  let errors = {};
-  let requestData = JSON.parse(req.query.requestData);
+  apvs = await req.mysqlConnection
+    .asyncQuery(req.mysqlConnection.SQL_APP.getAllCurrentApvData, [])
+    .then(
+      (result) => {
+        let __apvs = {};
 
-  if (requestData?.range == null) {
-    let from = new Date();
-    from.setHours(0, 0, 0);
-    let to = new Date();
-    to.setHours(23, 59, 59);
+        result.forEach((e) => {
+          e.chargeInfo = JSON.parse(e.chargeInfo);
+          e.data = JSON.parse(e.data);
+          e.online = e.online == 1;
+          e["remain"] = e.data.v1 - e.data.v2;
+          e["AVGHourlySell"] = 0;
+          e["elapsedTime"] = -1;
+          __apvs[e.sn] = e;
+        });
 
-    requestData.range = [from, to];
-  } else {
-    requestData.range = [
-      new Date(requestData.range[0]),
-      new Date(requestData.range[1]),
-    ];
+        return __apvs;
+      },
+      (err) => {
+        res.error("SQL", err);
+        console.log(err);
+        next();
+      }
+    );
+
+  await req.mysqlConnection
+    .asyncQuery(req.mysqlConnection.SQL_APP.getAllAVGDaylySell, [])
+    .then(
+      (result) => {
+        result.forEach((avg) => {
+          let __avgHourly = (avg?.AVGDaylySell / SELL_HOURS || 0).toFixed(1);
+
+          apvs[avg.sn].AVGHourlySell = __avgHourly;
+
+          if (__avgHourly > 0) {
+            apvs[avg.sn].elapsedTime = (
+              (apvs[avg.sn].data.v1 - apvs[avg.sn].data.v2) /
+              __avgHourly
+            ).toFixed(0);
+          }
+        });
+      },
+      (err) => {
+        res.error("SQL", err);
+        console.log(err);
+        next();
+      }
+    );
+
+  let __sortType = __requestData?.sortType;
+
+  if (__requestData.apvs.length > 0) {
+    let __newApvs = {};
+    __requestData.apvs.forEach((apv) => {
+      if (apvs[apv] != undefined) __newApvs[apv] = apvs[apv];
+    });
+    apvs = __newApvs;
   }
 
-  await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getDevices, [])
-    .then(
-      (result) => {
-        result.forEach((e) => {
-          devices[e.errorDevice] = e;
-        });
-      },
-      (err) => {
-        res.error("SQL", err);
-        console.log(err);
-      }
-    );
+  let __apvsArray = Object.values(apvs);
 
-  await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getErrors, [])
-    .then(
-      (result) => {
-        result.forEach((e) => {
-          errors[e.errorCode] = e;
-        });
-      },
-      (err) => {
-        res.error("SQL", err);
-        console.log(err);
-      }
-    );
+  if (__sortType == 0) {
+    __apvsArray = __apvsArray.sort((a, b) => {
+      return a.sn > b.sn ? 1 : -1;
+    });
+  } else if (__sortType == 1) {
+    __apvsArray = __apvsArray.sort((a, b) => {
+      return b.remain - a.remain;
+    });
+  } else if (__sortType == 2) {
+    __apvsArray = __apvsArray.sort((a, b) => {
+      return a.remain - b.remain;
+    });
+  }
 
-  await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getMessages, [])
-    .then(
-      (result) => {
-        result.forEach((e) => {
-          messages[e.messCode] = e;
-        });
-      },
-      (err) => {
-        res.error("SQL", err);
-        console.log(err);
-      }
-    );
+  let __pagedApvsArray = [];
 
-  await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getAllAPV, [])
-    .then(
-      (result) => {
-        result.forEach((e) => {
-          apv[e.sn] = e;
-        });
-      },
-      (err) => {
-        res.error("SQL", err);
-        console.log(err);
-      }
-    );
+  for (const [index, element] of __apvsArray.entries()) {
+    if (
+      (index >= __currentPage * __perPage) &
+      (index < (__currentPage + 1) * __perPage)
+    ) {
+      __pagedApvsArray.push(element);
+    }
+  }
 
-  await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getAllKrugs, [])
-    .then(
-      (result) => {
-        result.forEach((e) => {
-          krug[e.krug_id] = e;
-        });
-      },
-      (err) => {
-        res.error("SQL", err);
-        console.log(err);
-      }
-    );
+  data.queryLength = __apvsArray.length;
+  data.apvs = __pagedApvsArray;
+  res.result.data = data;
 
-  await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getAllBrigs, [])
-    .then(
-      (result) => {
-        result.forEach((e) => {
-          brigs[e.brig_id] = e;
-        });
-      },
-      (err) => {
-        res.error("SQL", err);
-        console.log(err);
-      }
-    );
-
-  await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getMainCount(requestData), [
-      requestData.range[0],
-      requestData.range[1],
-    ])
-    .then(
-      (result) => {
-        data.queryLength = result[0].queryLength;
-      },
-      (err) => {
-        res.error("SQL", err);
-        console.log(err);
-      }
-    );
-
-  await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getMain(requestData), [
-      requestData.range[0],
-      requestData.range[1],
-      currentPage * perPage,
-      perPage,
-    ])
-    .then(
-      async (result) => {
-        result.forEach((e) => {
-          let activeKrug = apv?.[e.sn].activeKrug || 0;
-          e["krug_name"] = krug?.[activeKrug]?.title || "-";
-          e["address"] = apv?.[e.sn].address || "-";
-          e["brigName"] = brigs?.[krug?.[activeKrug].brig_id]?.brigName || "-";
-          e.messCode = JSON.parse(e.messCode);
-          e.messages = {};
-
-          e.messCode.forEach((code) => {
-            e.messages[code] = messages[code]?.messText || code;
-          });
-          e["errorText"] = errors?.[e.errorCode]?.errorText || e.errorCode;
-          e["deviceName"] =
-            devices?.[e.errorDevice]?.deviceName || e.errorDevice;
-        });
-        data.items = result;
-        res.result.data = data;
-        res.ok();
-      },
-      (err) => {
-        res.error("SQL", err);
-        console.log(err);
-      }
-    );
+  res.ok();
 });
 
 module.exports = router;

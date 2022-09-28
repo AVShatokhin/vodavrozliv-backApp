@@ -51,6 +51,8 @@ module.exports = (config) => {
     dropCmdInkas: `UPDATE apv SET cmdProfile='{}' where sn=?`,
     getReminder: `SELECT value FROM kvs WHERE link=?`,
     applyReminder: `REPLACE INTO kvs SET link=?, value=?`,
+    getAllCurrentApvData: `SELECT kvs.lts, link as sn, value as data, apv.chargeInfo, address, online FROM kvs, apv WHERE apv.sn = kvs.link`,
+    getAllAVGDaylySell: `SELECT sn, AVG(daylySellValue) as AVGDaylySell FROM dayly_stats WHERE date BETWEEN DATE_SUB(DATE(now()), INTERVAL 1 MONTH) AND DATE(now()) group by sn`,
   };
 };
 

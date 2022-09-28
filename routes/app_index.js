@@ -58,6 +58,7 @@ var setCmdInkas = require("./CmdsInkas/setCmdInkas");
 var dropCmdInkas = require("./CmdsInkas/dropCmdInkas");
 
 var getDispatcherMain = require("./DispatcherTable/getDispatcherMain");
+var getDispatcherFilterStructure = require("./DispatcherTable/getDispatcherFilterStructure");
 
 module.exports = [
   getAPV,
@@ -105,4 +106,5 @@ module.exports = [
   applyReminder,
   getReminder,
   getDispatcherMain,
+  getDispatcherFilterStructure,
 ];
