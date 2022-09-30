@@ -6,12 +6,13 @@ const START_PAGE = 0;
 const SELL_HOURS = 18;
 
 /* GET home page. */
-router.post("/getDispatcherMain", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["DISPATCHER"])) return;
+router.post("/getAnalMain", async function (req, res, next) {
+  if (!req.session.checkRole(req, res, ["ANALYST"])) return;
 
   let __requestData = req.body.requestData;
   let __currentPage = req.body.currentPage || START_PAGE;
   let __perPage = req.body.perPage || MAX_PAGE_SIZE;
+  // let __sortType = __requestData?.sortType;
 
   let data = {
     queryLength: 0,
@@ -28,10 +29,9 @@ router.post("/getDispatcherMain", async function (req, res, next) {
           e.chargeInfo = JSON.parse(e.chargeInfo);
           e.data = JSON.parse(e.data);
           e.online = e.online == 1;
-          e["remain"] = e.data.v1 - e.data.v2;
-          e["AVGHourlySell"] = 0;
-          e["elapsedTime"] = -1;
           __apvs[e.sn] = e;
+          __apvs[e.sn].AVGDaylySell = 0;
+          __apvs[e.sn].AVGHourlySell = 0;
         });
 
         return __apvs;
@@ -48,15 +48,11 @@ router.post("/getDispatcherMain", async function (req, res, next) {
     .then(
       (result) => {
         result.forEach((avg) => {
-          let __avgHourly = (avg?.AVGDaylySell / SELL_HOURS || 0).toFixed(1);
-
-          apvs[avg.sn].AVGHourlySell = __avgHourly;
-
-          if (__avgHourly > 0) {
-            apvs[avg.sn].elapsedTime = (
-              (apvs[avg.sn].data.v1 - apvs[avg.sn].data.v2) /
-              __avgHourly
-            ).toFixed(0);
+          let __avgDaylySEll = (avg?.AVGDaylySell || 0).toFixed(1);
+          let __avgHourly = (__avgDaylySEll / SELL_HOURS || 0).toFixed(1);
+          if (apvs?.[avg.sn]) {
+            apvs[avg.sn].AVGDaylySell = __avgDaylySEll;
+            apvs[avg.sn].AVGHourlySell = __avgHourly;
           }
         });
       },
@@ -66,8 +62,6 @@ router.post("/getDispatcherMain", async function (req, res, next) {
         next();
       }
     );
-
-  let __sortType = __requestData?.sortType;
 
   if (__requestData.apvs.length > 0) {
     let __newApvs = {};
@@ -79,28 +73,32 @@ router.post("/getDispatcherMain", async function (req, res, next) {
 
   let __apvsArray = Object.values(apvs);
 
-  if (__sortType == 0) {
-    __apvsArray = __apvsArray.sort((a, b) => {
-      return a.sn > b.sn ? 1 : -1;
-    });
-  } else if (__sortType == 1) {
-    __apvsArray = __apvsArray.sort((a, b) => {
-      return b.remain - a.remain;
-    });
-  } else if (__sortType == 2) {
-    __apvsArray = __apvsArray.sort((a, b) => {
-      return a.remain - b.remain;
-    });
-  }
+  // if (__sortType == 0) {
+  //   __apvsArray = __apvsArray.sort((a, b) => {
+  //     return a.sn > b.sn ? 1 : -1;
+  //   });
+  // } else if (__sortType == 1) {
+  //   __apvsArray = __apvsArray.sort((a, b) => {
+  //     return b.remain - a.remain;
+  //   });
+  // } else if (__sortType == 2) {
+  //   __apvsArray = __apvsArray.sort((a, b) => {
+  //     return a.remain - b.remain;
+  //   });
+  // }
 
   let __pagedApvsArray = [];
 
-  for (const [index, element] of __apvsArray.entries()) {
-    if (
-      (index >= __currentPage * __perPage) &
-      (index < (__currentPage + 1) * __perPage)
-    ) {
-      __pagedApvsArray.push(element);
+  if (__perPage == -1) {
+    __pagedApvsArray = __apvsArray;
+  } else {
+    for (const [index, element] of __apvsArray.entries()) {
+      if (
+        (index >= __currentPage * __perPage) &
+        (index < (__currentPage + 1) * __perPage)
+      ) {
+        __pagedApvsArray.push(element);
+      }
     }
   }
 

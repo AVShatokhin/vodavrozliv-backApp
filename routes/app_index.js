@@ -58,7 +58,9 @@ var setCmdInkas = require("./CmdsInkas/setCmdInkas");
 var dropCmdInkas = require("./CmdsInkas/dropCmdInkas");
 
 var getDispatcherMain = require("./DispatcherTable/getDispatcherMain");
-var getDispatcherFilterStructure = require("./DispatcherTable/getDispatcherFilterStructure");
+var getAnalMain = require("./AnalDaylySell/getAnalMain");
+
+var getSnSelectorData = require("./SnSelector/getSnSelectorData");
 
 module.exports = [
   getAPV,
@@ -106,5 +108,6 @@ module.exports = [
   applyReminder,
   getReminder,
   getDispatcherMain,
-  getDispatcherFilterStructure,
+  getAnalMain,
+  getSnSelectorData,
 ];

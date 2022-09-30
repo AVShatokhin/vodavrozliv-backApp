@@ -2,17 +2,26 @@ var express = require("express");
 var router = express.Router();
 
 /* GET home page. */
-router.get("/getDispatcherFilterStructure", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["DISPATCHER"])) return;
+router.get("/getSnSelectorData", async function (req, res, next) {
+  if (
+    !req.session.checkRole(req, res, [
+      "ANALYST",
+      "ACCOUNTANT",
+      "CASHIER",
+      "DEPUTY",
+      "HEAD_OP_DEP",
+      "ENGINEER",
+      "PROGRAMMER",
+      "DISPATCHER",
+    ])
+  )
+    return;
 
   let structure = {
     apvs: {},
     krugs: {},
     brigs: {},
     engs: {},
-    // devices: {},
-    // errors: {},
-    // messages: {},
   };
 
   let __failed = false;
@@ -79,51 +88,6 @@ router.get("/getDispatcherFilterStructure", async function (req, res, next) {
         console.log(err);
       }
     );
-
-  // await req.mysqlConnection
-  //   .asyncQuery(req.mysqlConnection.SQL_APP.getDevices, [])
-  //   .then(
-  //     (result) => {
-  //       result.forEach((e) => {
-  //         structure.devices[e.errorDevice] = e;
-  //       });
-  //     },
-  //     (err) => {
-  //       __failed = true;
-  //       __error = err;
-  //       console.log(err);
-  //     }
-  //   );
-
-  // await req.mysqlConnection
-  //   .asyncQuery(req.mysqlConnection.SQL_APP.getErrors, [])
-  //   .then(
-  //     (result) => {
-  //       result.forEach((e) => {
-  //         structure.errors[e.errorCode] = e;
-  //       });
-  //     },
-  //     (err) => {
-  //       __failed = true;
-  //       __error = err;
-  //       console.log(err);
-  //     }
-  //   );
-
-  // await req.mysqlConnection
-  //   .asyncQuery(req.mysqlConnection.SQL_APP.getMessages, [])
-  //   .then(
-  //     (result) => {
-  //       result.forEach((e) => {
-  //         structure.messages[e.messCode] = e;
-  //       });
-  //     },
-  //     (err) => {
-  //       __failed = true;
-  //       __error = err;
-  //       console.log(err);
-  //     }
-  //   );
 
   if (__failed) {
     res.error("SQL", __error);

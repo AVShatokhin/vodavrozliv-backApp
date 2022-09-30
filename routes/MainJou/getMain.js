@@ -158,7 +158,7 @@ router.get("/getMain", async function (req, res, next) {
           let activeKrug = apv?.[e.sn].activeKrug || 0;
           e["krug_name"] = krug?.[activeKrug]?.title || "-";
           e["address"] = apv?.[e.sn].address || "-";
-          e["brigName"] = brigs?.[krug?.[activeKrug].brig_id]?.brigName || "-";
+          e["brigName"] = brigs?.[krug?.[activeKrug]?.brig_id]?.brigName || "-";
           e.messCode = JSON.parse(e.messCode);
           e.messages = {};
 
