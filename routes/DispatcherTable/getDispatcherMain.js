@@ -48,15 +48,17 @@ router.post("/getDispatcherMain", async function (req, res, next) {
     .then(
       (result) => {
         result.forEach((avg) => {
-          let __avgHourly = (avg?.AVGDaylySell / SELL_HOURS || 0).toFixed(1);
+          if (apvs?.[avg.sn]) {
+            let __avgHourly = (avg?.AVGDaylySell / SELL_HOURS || 0).toFixed(1);
 
-          apvs[avg.sn].AVGHourlySell = __avgHourly;
+            apvs[avg.sn].AVGHourlySell = __avgHourly;
 
-          if (__avgHourly > 0) {
-            apvs[avg.sn].elapsedTime = (
-              (apvs[avg.sn].data.v1 - apvs[avg.sn].data.v2) /
-              __avgHourly
-            ).toFixed(0);
+            if (__avgHourly > 0) {
+              apvs[avg.sn].elapsedTime = (
+                (apvs[avg.sn].data.v1 - apvs[avg.sn].data.v2) /
+                __avgHourly
+              ).toFixed(0);
+            }
           }
         });
       },

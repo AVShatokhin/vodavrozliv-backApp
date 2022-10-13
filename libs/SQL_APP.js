@@ -53,7 +53,57 @@ module.exports = (config) => {
     applyReminder: `REPLACE INTO kvs SET link=?, value=?`,
     getAllCurrentApvData: `SELECT kvs.lts, link as sn, value as data, apv.chargeInfo, address, online FROM kvs, apv WHERE apv.sn = kvs.link`,
     getAllAVGDaylySell: `SELECT sn, AVG(daylySellValue) as AVGDaylySell FROM dayly_stats WHERE date BETWEEN DATE_SUB(DATE(now()), INTERVAL 1 MONTH) AND DATE(now()) group by sn`,
+    getCashierInkass,
+    getCashierInkassCount,
+    getCashierInkassPodItog,
+    getCashierItog: `SELECT sn, cinkass_id, m1, m2, m5, m10, k, lts, dateCreation, summ FROM cashier_inkass WHERE cashierUid=? AND dateCreation BETWEEN ? AND ? ORDER by lts`,
+    checkDuplikateInkass: `SELECT sn FROM cashier_inkass WHERE sn=? and dateInkass=?`,
+    addCashierInkass: `INSERT INTO cashier_inkass SET sn=?, duplikateSn=?, dateInkass=?, dateCreation=?, m1=?, m2=?, m5=?, m10=?, k=?, summ=?, comment=?, dontUseSn=?, isDuplikate=?, cashierSign=?, cashierUid=?`,
+    delCashierInkass: `DELETE FROM cashier_inkass where cinkass_id=? AND cashierUid=?`,
+    updateCashierInkass: `UPDATE cashier_inkass SET sn=?, duplikateSn=?, dateInkass=?, dateCreation=?, m1=?, m2=?, m5=?, m10=?, k=?, summ=?, comment=?, dontUseSn=?, isDuplikate=? WHERE cinkass_id=? AND cashierUid=?`,
   };
+};
+
+let getCashierInkass = (requestData) => {
+  let __order = "";
+
+  if (requestData.sortType == 0) {
+    __order = "order by dateCreation desc";
+  } else if (requestData.sortType == 1) {
+    __order = "order by dateInkass desc";
+  } else if (requestData.sortType == 2) {
+    __order = "order by sn, dateInkass";
+  } else if (requestData.sortType == 3) {
+    __order = "order by summ";
+  } else if (requestData.sortType == 4) {
+    __order = "order by summ desc";
+  }
+
+  return `SELECT duplikateSn, isDuplikate, dontUseSn, cinkass_id, cashier_inkass.lts, dateInkass, dateCreation, cashier_inkass.sn, m1, m2, m5, m10, k, summ, comment, isPrihod, apv.address as address 
+  from cashier_inkass LEFT JOIN apv ON cashier_inkass.sn=apv.sn 
+  WHERE cashierUid=? AND ((dateCreation BETWEEN ? AND ?) OR ${
+    requestData?.useCreationDate ? 0 : 1
+  }) and ((dateInkass BETWEEN ? AND ?) OR ${
+    requestData?.useInkassDate ? 0 : 1
+  }) AND ${sqlFromArray("sn", requestData.apvs)} ${__order} LIMIT ?, ?`;
+};
+
+let getCashierInkassPodItog = (requestData) => {
+  return `SELECT count(*) as count, sum(m1) as m1, sum(m2) as m2, sum(m5) as m5, sum(m10) as m10, sum(k) as k FROM cashier_inkass WHERE 
+  cashierUid=? and
+  ((dateCreation BETWEEN ? AND ?) OR ${
+    requestData?.useCreationDate ? 0 : 1
+  }) and ((dateInkass BETWEEN ? AND ?) OR ${
+    requestData?.useInkassDate ? 0 : 1
+  }) AND ${sqlFromArray("sn", requestData.apvs)}`;
+};
+
+let getCashierInkassCount = (requestData) => {
+  return `SELECT count(*) as queryLength FROM cashier_inkass WHERE cashierUid=? AND ((dateCreation BETWEEN ? AND ?) OR ${
+    requestData?.useCreationDate ? 0 : 1
+  }) and ((dateInkass BETWEEN ? AND ?) OR ${
+    requestData?.useInkassDate ? 0 : 1
+  }) AND ${sqlFromArray("sn", requestData.apvs)}`;
 };
 
 let getMain = (requestData) => {

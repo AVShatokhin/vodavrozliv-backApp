@@ -62,6 +62,10 @@ var getAnalMain = require("./AnalDaylySell/getAnalMain");
 
 var getSnSelectorData = require("./SnSelector/getSnSelectorData");
 
+var getCashierInkass = require("./CashierInkass/getCashierInkass");
+var addCashierInkass = require("./CashierInkass/addCashierInkass");
+var delCashierInkass = require("./CashierInkass/delCashierInkass");
+
 module.exports = [
   getAPV,
   addAPV,
@@ -110,4 +114,9 @@ module.exports = [
   getDispatcherMain,
   getAnalMain,
   getSnSelectorData,
+  getCashierInkass,
+  addCashierInkass,
+  delCashierInkass,
+  require("./CashierInkass/updateCashierInkass"),
+  require("./CashierItog/getCashierItog"),
 ];
