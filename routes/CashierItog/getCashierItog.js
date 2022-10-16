@@ -5,11 +5,6 @@ var router = express.Router();
 router.get("/getCashierItog", async function (req, res, next) {
   if (!req.session.checkRole(req, res, ["CASHIER"])) return;
 
-  let data = {
-    queryLength: 0,
-    items: [],
-  };
-
   let requestData = JSON.parse(req.query.requestData);
 
   let __dateCreationFrom = FROM_SECONDS(requestData.dateCreationFrom / 1000);

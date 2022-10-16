@@ -26,12 +26,14 @@ router.post("/updateCashierInkass", async function (req, res, next) {
   let __summ = __m1 + 2 * __m2 + 5 * __m5 + 10 * __m10 + __k;
   let __sn = req.body.data.sn;
   let __duplikateSn = req.body.data.sn;
+  let __cinkass_id = req.body.data.cinkass_id;
 
   let _isDuplikate =
     (await req.mysqlConnection
       .asyncQuery(req.mysqlConnection.SQL_APP.checkDuplikateInkass, [
         __sn,
         __dateInkass,
+        __cinkass_id,
       ])
       .then(
         (result) => {

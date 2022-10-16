@@ -24,10 +24,18 @@ router.get("/getInkas", async function (req, res, next) {
 
   let perPage = Number(req.query?.perPage || MAX_PAGE_SIZE);
   let currentPage = Number(req.query?.currentPage || START_PAGE);
-  let searchQuery = req.query?.searchQuery || "";
+
+  let requestData = JSON.parse(req.query.requestData);
+
+  let __dateInkassFrom = FROM_SECONDS(requestData.dateInkassFrom / 1000);
+  let __dateInkassTo = FROM_SECONDS(requestData.dateInkassTo / 1000);
+  let __apvs = requestData.apvs;
 
   await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getInkasCount, [])
+    .asyncQuery(req.mysqlConnection.SQL_APP.getInkasCount(__apvs), [
+      __dateInkassFrom,
+      __dateInkassTo,
+    ])
     .then(
       (result) => {
         data.queryLength = result[0].queryLength;
@@ -40,7 +48,9 @@ router.get("/getInkas", async function (req, res, next) {
     );
 
   await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getInkas, [
+    .asyncQuery(req.mysqlConnection.SQL_APP.getInkas(__apvs), [
+      __dateInkassFrom,
+      __dateInkassTo,
       currentPage * perPage,
       perPage,
     ])
@@ -56,5 +66,15 @@ router.get("/getInkas", async function (req, res, next) {
       }
     );
 });
+
+let FROM_SECONDS = (seconds) => {
+  let __date = new Date();
+  __date.setTime(seconds * 1000);
+  return `${1900 + __date.getYear()}-${
+    1 + __date.getMonth() > 9
+      ? 1 + __date.getMonth()
+      : "0" + (1 + __date.getMonth())
+  }-${__date.getDate() > 9 ? __date.getDate() : "0" + __date.getDate()}`;
+};
 
 module.exports = router;

@@ -119,4 +119,8 @@ module.exports = [
   delCashierInkass,
   require("./CashierInkass/updateCashierInkass"),
   require("./CashierItog/getCashierItog"),
+  require("./AnalInkass/getAnalByInkass"),
+  require("./AnalInkass/getAnalByCreation"),
+  require("./AnalInkass/setInkassPrihod"),
+  require("./AnalInkass/getAllCashiers"),
 ];

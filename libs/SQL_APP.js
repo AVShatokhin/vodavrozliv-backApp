@@ -25,8 +25,8 @@ module.exports = (config) => {
     getBrigMembers: `SELECT brigMembers from brig where brig_id=?`,
     updateMembersInBrig: `UPDATE brig SET brigMembers=? where brig_id=?`,
     updateBrig: `UPDATE brig SET brigName=?, brigCar=?, brigKey=?, brigPhone=? where brig_id=?`,
-    getInkas: `SELECT dateUnique, inkas_id, sn, inkas_number, lts, date, version, inkas, kup, box, op, op_extended, op_state, rd, address, krug_name from inkas order by lts desc LIMIT ?, ?`,
-    getInkasCount: `SELECT count(*) as queryLength from inkas`,
+    getInkas,
+    getInkasCount,
     getMain,
     getMainCount,
     getDevices: `SELECT errorDevice, deviceName from device`,
@@ -56,12 +56,62 @@ module.exports = (config) => {
     getCashierInkass,
     getCashierInkassCount,
     getCashierInkassPodItog,
-    getCashierItog: `SELECT sn, cinkass_id, m1, m2, m5, m10, k, lts, dateCreation, summ FROM cashier_inkass WHERE cashierUid=? AND dateCreation BETWEEN ? AND ? ORDER by lts`,
-    checkDuplikateInkass: `SELECT sn FROM cashier_inkass WHERE sn=? and dateInkass=?`,
+    getTerminalInkassByInkassDate,
+    getCashierInkassByInkassDate,
+    getCashierInkassByCreationDate,
+    getCashierItog: `SELECT sn, cinkass_id, m1, m2, m5, m10, k, lts, dateInkass, summ FROM cashier_inkass WHERE cashierUid=? AND dateCreation BETWEEN ? AND ? ORDER by lts`,
+    checkDuplikateInkass: `SELECT sn FROM cashier_inkass WHERE sn=? and dateInkass=? and cinkass_id != ?`,
     addCashierInkass: `INSERT INTO cashier_inkass SET sn=?, duplikateSn=?, dateInkass=?, dateCreation=?, m1=?, m2=?, m5=?, m10=?, k=?, summ=?, comment=?, dontUseSn=?, isDuplikate=?, cashierSign=?, cashierUid=?`,
     delCashierInkass: `DELETE FROM cashier_inkass where cinkass_id=? AND cashierUid=?`,
     updateCashierInkass: `UPDATE cashier_inkass SET sn=?, duplikateSn=?, dateInkass=?, dateCreation=?, m1=?, m2=?, m5=?, m10=?, k=?, summ=?, comment=?, dontUseSn=?, isDuplikate=? WHERE cinkass_id=? AND cashierUid=?`,
+    setInkassPrihod: `UPDATE cashier_inkass SET isPrihod=?, datePrihod=DATE(now()) WHERE cinkass_id=?`,
+    getAllCashiers: `SELECT uid, extended, email  FROM ${config.db_prefix}_users WHERE roles like CONCAT('%',?,'%') order by uid`,
   };
+};
+
+let getInkas = (apvs) => {
+  return `SELECT dateUnique, inkas_id, sn, inkas_number, lts, date, version, inkas, kup, box, op, op_extended, op_state, rd, address, krug_name 
+  from inkas 
+  WHERE ${sqlFromArray("sn", apvs)} AND DATE(lts) BETWEEN ? AND ? 
+  ORDER BY lts DESC LIMIT ?, ?`;
+};
+
+let getInkasCount = (apvs) => {
+  return `SELECT count(*) as queryLength from inkas WHERE ${sqlFromArray(
+    "sn",
+    apvs
+  )} AND DATE(lts) BETWEEN ? AND ?`;
+};
+
+let getCashierInkassByInkassDate = (apvs) => {
+  return `SELECT cashierUid, cashierSign, comment, dontUseSn, isDuplikate, duplikateSn, 
+  dateCreation, cinkass_id, isPrihod, datePrihod, 
+  sn, m1, m2, m5, m10, k, dateInkass, summ as cashierSumm 
+  FROM cashier_inkass WHERE ${sqlFromArray("sn", apvs)} AND
+  dateInkass BETWEEN ? AND ?`;
+};
+
+let getCashierInkassByCreationDate = (apvs, cashierUid) => {
+  let __cashierUid = cashierUid == -1 ? 1 : `cashierUid = ${cashierUid}`;
+  return `SELECT apv.address as address, cashierUid, cashierSign, comment, dontUseSn, isDuplikate, duplikateSn, 
+  dateCreation, cinkass_id, isPrihod, datePrihod, 
+  cashier_inkass.sn, m1, m2, m5, m10, k, dateInkass, summ as cashierSumm 
+  FROM cashier_inkass LEFT JOIN apv ON apv.sn=cashier_inkass.sn WHERE ${sqlFromArray(
+    "cashier_inkass.sn",
+    apvs
+  )} AND
+  dateCreation BETWEEN ? AND ? AND ${__cashierUid}`;
+};
+
+let getTerminalInkassByInkassDate = (apvs) => {
+  return `SELECT sn, DATE(lts) as dateInkass, address, 
+  sum(kup+box) as terminalSumm, 
+  sum(kup) as kup, 
+  sum(rd) as rd, 
+  sum(box) as box, 
+  count(*) as terminalInkassCount 
+  FROM inkas WHERE ${sqlFromArray("sn", apvs)}
+  AND DATE(lts) between ? and ? GROUP BY sn, dateInkass`;
 };
 
 let getCashierInkass = (requestData) => {
@@ -79,7 +129,7 @@ let getCashierInkass = (requestData) => {
     __order = "order by summ desc";
   }
 
-  return `SELECT duplikateSn, isDuplikate, dontUseSn, cinkass_id, cashier_inkass.lts, dateInkass, dateCreation, cashier_inkass.sn, m1, m2, m5, m10, k, summ, comment, isPrihod, apv.address as address 
+  return `SELECT duplikateSn, isDuplikate, dontUseSn, cinkass_id, cashier_inkass.lts, datePrihod, dateInkass, dateCreation, cashier_inkass.sn, m1, m2, m5, m10, k, summ, comment, isPrihod, apv.address as address 
   from cashier_inkass LEFT JOIN apv ON cashier_inkass.sn=apv.sn 
   WHERE cashierUid=? AND ((dateCreation BETWEEN ? AND ?) OR ${
     requestData?.useCreationDate ? 0 : 1

@@ -31,6 +31,7 @@ router.post("/addCashierInkass", async function (req, res, next) {
       .asyncQuery(req.mysqlConnection.SQL_APP.checkDuplikateInkass, [
         __sn,
         __dateInkass,
+        0,
       ])
       .then(
         (result) => {
