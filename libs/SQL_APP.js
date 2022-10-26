@@ -1,4 +1,8 @@
+let _config;
+
 module.exports = (config) => {
+  _config = config;
+
   return {
     Test: `SELECT test from test`,
     getAPV: `SELECT sn, a, address, activeKrug, tgLink, snEQ, cost, phone, version, linkState, oper, lts from apv WHERE sn like CONCAT('%',?,'%') or address like CONCAT('%',?,'%') or oper like CONCAT('%',?,'%') or phone like CONCAT('%',?,'%') or snEQ like CONCAT('%',?,'%') order by sn LIMIT ?, ?`,
@@ -66,7 +70,20 @@ module.exports = (config) => {
     updateCashierInkass: `UPDATE cashier_inkass SET sn=?, duplikateSn=?, dateInkass=?, dateCreation=?, m1=?, m2=?, m5=?, m10=?, k=?, summ=?, comment=?, dontUseSn=?, isDuplikate=? WHERE cinkass_id=? AND cashierUid=?`,
     setInkassPrihod: `UPDATE cashier_inkass SET isPrihod=?, datePrihod=DATE(now()) WHERE cinkass_id=?`,
     getAllCashiers: `SELECT uid, extended, email  FROM ${config.db_prefix}_users WHERE roles like CONCAT('%',?,'%') order by uid`,
+    getDevicesNormal: `SELECT errorDevice, deviceName from device where errorDevice!=${config.deviceNormal}`,
+    getErrorsNormal: `SELECT errorCode, errorText, isActive from error where errorCode!=${config.errorNormal}`,
+    getProblems,
+    getAPVAddressAndBrig: `SELECT sn, address, brig.brigName FROM apv LEFT JOIN krug ON activeKrug=krug.krug_id LEFT JOIN brig ON krug.brig_id=brig.brig_id`,
   };
+};
+
+let getProblems = (apvs, errors, devices) => {
+  return `SELECT lts, sn, errorCode, errorDevice, enabled
+  FROM error_stat
+  WHERE ${sqlFromArray("sn", apvs)} AND (DATE(lts) BETWEEN ? AND ?) 
+  AND ${sqlFromArray("errorCode", errors)} 
+  AND ${sqlFromArray("errorDevice", devices)}
+  ORDER BY lts`;
 };
 
 let getInkas = (apvs) => {
@@ -157,7 +174,7 @@ let getCashierInkassCount = (requestData) => {
 };
 
 let getMain = (requestData) => {
-  return `SELECT sn, version, lts, FLAG_start, w, k, r, m, m1, m2, m5, m10, c, errorDevice, errorCode, messCode, FLAG_k_off, FLAG_m_off, FLAG_c_off, FLAG_r_off, FLAG_error_m1, FLAG_error_m2, FLAG_error_m5, FLAG_error_m10, v1, v2, v3, v4, FLAG_t_off, dv1, dv2, dv3, dv4, dv5, tSOLD, tREMAIN from main where (lts between ? and ?) and ${calcSqlWhereForMain(
+  return `SELECT sn, version, lts, FLAG_start, w, k, r, m, m1, m2, m5, m10, c, f, errorDevice, errorCode, messCode, FLAG_k_off, FLAG_m_off, FLAG_c_off, FLAG_r_off, FLAG_error_m1, FLAG_error_m2, FLAG_error_m5, FLAG_error_m10, v1, v2, v3, v4, FLAG_t_off, dv1, dv2, dv3, dv4, dv5, tSOLD, tREMAIN, FLAG_f_off from main where (lts between ? and ?) and ${calcSqlWhereForMain(
     requestData
   )} order by lts desc LIMIT ?, ?`;
 };

@@ -123,4 +123,6 @@ module.exports = [
   require("./AnalInkass/getAnalByCreation"),
   require("./AnalInkass/setInkassPrihod"),
   require("./AnalInkass/getAllCashiers"),
+  require("./AnalErrors/getAllErrorsAndDevices"),
+  require("./AnalErrors/getAnalErrors"),
 ];
