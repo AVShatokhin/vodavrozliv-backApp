@@ -96,9 +96,13 @@ router.get("/getAnalByInkass", async function (req, res, next) {
     );
 
   let __forSortArray = [];
+  res.result.cinkass_ids = [];
+
   Object.keys(inks).forEach((apv) => {
     Object.keys(inks[apv]).forEach((inkassDate) => {
       __forSortArray.push(inks[apv][inkassDate]);
+      if (inks[apv][inkassDate]?.cinkass_id != null)
+        res.result.cinkass_ids.push(inks[apv][inkassDate].cinkass_id);
     });
   });
 

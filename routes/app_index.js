@@ -125,4 +125,6 @@ module.exports = [
   require("./AnalInkass/getAllCashiers"),
   require("./AnalErrors/getAllErrorsAndDevices"),
   require("./AnalErrors/getAnalErrors"),
+  require("./AnalFreeWater/getFreeWater"),
+  require("./AnalInkass/setPrihodAll"),
 ];

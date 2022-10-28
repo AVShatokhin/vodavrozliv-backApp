@@ -69,12 +69,21 @@ module.exports = (config) => {
     delCashierInkass: `DELETE FROM cashier_inkass where cinkass_id=? AND cashierUid=?`,
     updateCashierInkass: `UPDATE cashier_inkass SET sn=?, duplikateSn=?, dateInkass=?, dateCreation=?, m1=?, m2=?, m5=?, m10=?, k=?, summ=?, comment=?, dontUseSn=?, isDuplikate=? WHERE cinkass_id=? AND cashierUid=?`,
     setInkassPrihod: `UPDATE cashier_inkass SET isPrihod=?, datePrihod=DATE(now()) WHERE cinkass_id=?`,
+    setInkassMassPrihod,
     getAllCashiers: `SELECT uid, extended, email  FROM ${config.db_prefix}_users WHERE roles like CONCAT('%',?,'%') order by uid`,
     getDevicesNormal: `SELECT errorDevice, deviceName from device where errorDevice!=${config.deviceNormal}`,
     getErrorsNormal: `SELECT errorCode, errorText, isActive from error where errorCode!=${config.errorNormal}`,
     getProblems,
     getAPVAddressAndBrig: `SELECT sn, address, brig.brigName FROM apv LEFT JOIN krug ON activeKrug=krug.krug_id LEFT JOIN brig ON krug.brig_id=brig.brig_id`,
+    getFreeWater,
   };
+};
+
+let setInkassMassPrihod = (cinkass_ids) => {
+  return `UPDATE cashier_inkass SET isPrihod=?, datePrihod=DATE(now()) WHERE ${sqlFromArray(
+    "cinkass_id",
+    cinkass_ids
+  )} `;
 };
 
 let getProblems = (apvs, errors, devices) => {
@@ -83,6 +92,13 @@ let getProblems = (apvs, errors, devices) => {
   WHERE ${sqlFromArray("sn", apvs)} AND (DATE(lts) BETWEEN ? AND ?) 
   AND ${sqlFromArray("errorCode", errors)} 
   AND ${sqlFromArray("errorDevice", devices)}
+  ORDER BY lts`;
+};
+
+let getFreeWater = (apvs) => {
+  return `SELECT lts, sn, FLAG_f_off, f
+  FROM free_stat
+  WHERE ${sqlFromArray("sn", apvs)} AND (DATE(lts) BETWEEN ? AND ?) 
   ORDER BY lts`;
 };
 
@@ -195,7 +211,7 @@ let calcSqlWhereForMain = (requestData) => {
   )}`;
 };
 
-let sqlFromArray = (column, array) => {
+let sqlFromArray = (column, array, defaultV) => {
   let __processingArray = [];
   if (array?.length > 0) {
     array.forEach((value) => {
@@ -204,6 +220,6 @@ let sqlFromArray = (column, array) => {
 
     return "(" + __processingArray.join("or") + ")";
   } else {
-    return "1";
+    return defaultV || "1";
   }
 };
