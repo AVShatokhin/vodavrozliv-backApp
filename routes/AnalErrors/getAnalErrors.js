@@ -116,71 +116,6 @@ router.get("/getAnalErrors", async function (req, res, next) {
               delete __activeProblems[__key];
             }
           }
-
-          // if (__activeProblem?.[__sn] == null) {
-          //   if (
-          //     pr.errorCode != 0 &&
-          //     pr.errorDevice != 0 &&
-          //     !(
-          //       pr.errorCode == config.sync_onlineCode &&
-          //       pr.errorDevice == config.sync_LinkDevice
-          //     )
-          //   ) {
-          //     __activeProblem[__sn] = {
-          //       sn: __sn,
-          //       startLts: pr.lts,
-          //       stopLts: pr.lts,
-          //       errorCode: pr.errorCode,
-          //       errorDevice: pr.errorDevice,
-          //       deviceName: devices?.[pr.errorDevice],
-          //       errorText: errors?.[pr.errorCode],
-          //       address: apvs?.[__sn]?.address,
-          //       brigName: apvs?.[__sn]?.brigName,
-          //     };
-          //   }
-          // } else {
-          //   if (
-          //     __activeProblem[__sn].errorCode != pr.errorCode ||
-          //     __activeProblem[__sn].errorDevice != pr.errorDevice
-          //   ) {
-          //     if (__problems?.[__sn] == null) __problems[__sn] = [];
-
-          //     __problems[__sn].push({
-          //       sn: __sn,
-          //       startLts: __activeProblem[__sn].startLts,
-          //       stopLts: pr.lts,
-          //       errorCode: __activeProblem[__sn].errorCode,
-          //       errorDevice: __activeProblem[__sn].errorDevice,
-          //       deviceName: __activeProblem[__sn].deviceName,
-          //       errorText: __activeProblem[__sn].errorText,
-          //       address: __activeProblem[__sn].address,
-          //       brigName: __activeProblem[__sn].brigName,
-          //     });
-
-          //     if (
-          //       pr.errorCode != 0 &&
-          //       pr.errorDevice != 0 &&
-          //       !(
-          //         pr.errorCode == config.sync_onlineCode &&
-          //         pr.errorDevice == config.sync_LinkDevice
-          //       )
-          //     ) {
-          //       __activeProblem[__sn] = {
-          //         sn: __sn,
-          //         startLts: pr.lts,
-          //         stopLts: pr.lts,
-          //         errorCode: pr.errorCode,
-          //         errorDevice: pr.errorDevice,
-          //         deviceName: devices?.[pr.errorDevice],
-          //         errorText: errors?.[pr.errorCode],
-          //         address: apvs?.[__sn]?.address,
-          //         brigName: apvs?.[__sn]?.brigName,
-          //       };
-          //     } else {
-          //       delete __activeProblem[__sn];
-          //     }
-          //   }
-          // }
         });
 
         Object.values(__activeProblems).forEach((pr) => {
@@ -196,8 +131,6 @@ router.get("/getAnalErrors", async function (req, res, next) {
             address: apvs?.[pr.sn]?.address,
             brigName: apvs?.[pr.sn]?.brigName,
           });
-          // if (__problems?.[__sn] == null) __problems[__sn] = [];
-          // __problems[__sn].push(__activeProblem[__sn]);
         });
 
         return __problems;
@@ -208,29 +141,6 @@ router.get("/getAnalErrors", async function (req, res, next) {
         return;
       }
     );
-
-  // let __forSortArray = [];
-  // Object.keys(problems).forEach((__sn) => {
-  //   problems[__sn].forEach((pr) => {
-  //     pr.long = (pr.stopLts - pr.startLts) / 1000;
-  //     __forSortArray.push(pr);
-  //   });
-  // });
-
-  // __forSortArray = __forSortArray.filter((e) => {
-  //   if (__selectedDevices.length == 0 && __selectedErrors.length == 0)
-  //     return true;
-
-  //   if (__selectedDevices.length > 0) {
-  //     if (__selectedDevices.includes(e.errorDevice)) return true;
-  //   }
-
-  //   if (__selectedErrors.length > 0) {
-  //     if (__selectedErrors.includes(e.errorCode)) return true;
-  //   }
-
-  //   return false;
-  // });
 
   let __unPagedArray = [];
 
@@ -247,6 +157,7 @@ router.get("/getAnalErrors", async function (req, res, next) {
       break;
     case 2: // long
       __unPagedArray = problems.sort((a, b) => {
+        if (a.startLts == a.stopLts) return -1;
         return a.long < b.long ? 1 : -1;
       });
       break;

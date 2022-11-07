@@ -103,10 +103,15 @@ let getFreeWater = (apvs) => {
 };
 
 let getInkas = (apvs) => {
-  return `SELECT dateUnique, inkas_id, sn, inkas_number, lts, date, version, inkas, kup, box, op, op_extended, op_state, rd, address, krug_name 
+  return `SELECT brig.brigName, dateUnique, inkas_id, inkas.sn as sn, inkas_number, 
+  inkas.lts as lts, date, inkas.version as verion, inkas, kup, box, op, op_extended, op_state, 
+  rd, inkas.address, inkas.krug_name 
   from inkas 
-  WHERE ${sqlFromArray("sn", apvs)} AND DATE(lts) BETWEEN ? AND ? 
-  ORDER BY lts DESC LIMIT ?, ?`;
+  LEFT JOIN apv ON apv.sn = inkas.sn 
+  LEFT JOIN krug ON apv.activeKrug=krug.krug_id 
+  LEFT JOIN brig ON krug.brig_id=brig.brig_id
+  WHERE ${sqlFromArray("inkas.sn", apvs)} AND DATE(inkas.lts) BETWEEN ? AND ? 
+  ORDER BY inkas.lts DESC LIMIT ?, ?`;
 };
 
 let getInkasCount = (apvs) => {
