@@ -76,6 +76,9 @@ module.exports = (config) => {
     getProblems,
     getAPVAddressAndBrig: `SELECT sn, address, brig.brigName FROM apv LEFT JOIN krug ON activeKrug=krug.krug_id LEFT JOIN brig ON krug.brig_id=brig.brig_id`,
     getFreeWater,
+    getWash: `SELECT dateUnique, washObject FROM wash WHERE dateUnique BETWEEN ? AND ?`,
+    getWashByDate: `SELECT washObject FROM wash WHERE dateUnique=?`,
+    updateWash: `REPLACE INTO wash SET washObject=?, dateUnique=?`,
   };
 };
 
@@ -104,7 +107,7 @@ let getFreeWater = (apvs) => {
 
 let getInkas = (apvs) => {
   return `SELECT brig.brigName, dateUnique, inkas_id, inkas.sn as sn, inkas_number, 
-  inkas.lts as lts, date, inkas.version as verion, inkas, kup, box, op, op_extended, op_state, 
+  inkas.lts as lts, date, inkas.version as version, inkas, kup, box, op, op_extended, op_state, 
   rd, inkas.address, inkas.krug_name 
   from inkas 
   LEFT JOIN apv ON apv.sn = inkas.sn 

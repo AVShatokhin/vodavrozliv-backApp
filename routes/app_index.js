@@ -127,4 +127,7 @@ module.exports = [
   require("./AnalErrors/getAnalErrors"),
   require("./AnalFreeWater/getFreeWater"),
   require("./AnalInkass/setPrihodAll"),
+  require("./DispatcherWash/getWash"),
+  require("./DispatcherWash/addWashApv"),
+  require("./DispatcherWash/delWashApv"),
 ];
