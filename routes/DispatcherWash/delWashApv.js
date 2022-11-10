@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.post("/delWashApv", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["ENGINEER"])) return;
+  if (!req.session.checkRole(req, res, ["DISPATCHER", "HEAD_OP_DEP"])) return;
 
   let __date = req.body.date;
   let __sn = req.body.sn;

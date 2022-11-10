@@ -79,7 +79,47 @@ module.exports = (config) => {
     getWash: `SELECT dateUnique, washObject FROM wash WHERE dateUnique BETWEEN ? AND ?`,
     getWashByDate: `SELECT washObject FROM wash WHERE dateUnique=?`,
     updateWash: `REPLACE INTO wash SET washObject=?, dateUnique=?`,
+    getBuhActuals,
+    getBuhReport,
+    getBuhReportCount,
+    getBuhReportUnlim,
+    getBuhReportPoditog,
   };
+};
+
+let getBuhReportPoditog = (apvs) => {
+  return `SELECT  sum(eq) as eq, sum(nal) as nal, sum(tSOLD) as tSOLD, sum(w) as w FROM delta WHERE ${sqlFromArray(
+    "sn",
+    apvs
+  )} and date BETWEEN ? AND ?`;
+};
+
+let getBuhReport = (apvs) => {
+  return `SELECT delta.sn, date, eq, nal, tSOLD, w, address FROM delta LEFT JOIN apv ON apv.sn = delta.sn WHERE ${sqlFromArray(
+    "sn",
+    apvs
+  )} and date BETWEEN ? AND ? ORDER BY date DESC, delta.sn LIMIT ?, ?`;
+};
+
+let getBuhReportCount = (apvs) => {
+  return `SELECT count(*) as queryLength FROM delta WHERE ${sqlFromArray(
+    "sn",
+    apvs
+  )} and date BETWEEN ? AND ?`;
+};
+
+let getBuhReportUnlim = (apvs) => {
+  return `SELECT delta.sn, date, eq, nal, tSOLD, w, address FROM delta LEFT JOIN apv ON apv.sn = delta.sn WHERE ${sqlFromArray(
+    "sn",
+    apvs
+  )} and date BETWEEN ? AND ? ORDER BY date DESC, delta.sn`;
+};
+
+let getBuhActuals = (apvs) => {
+  return `SELECT sn, inkassLts, address, kvs.lts as lts, kvs.value as value FROM apv LEFT JOIN kvs ON apv.sn = kvs.link WHERE ${sqlFromArray(
+    "sn",
+    apvs
+  )} ORDER by sn`;
 };
 
 let setInkassMassPrihod = (cinkass_ids) => {

@@ -6,15 +6,7 @@ const START_PAGE = 0;
 
 /* GET home page. */
 router.get("/getMain", async function (req, res, next) {
-  if (
-    !req.session.checkRole(req, res, [
-      "HEAD_ANALYSTOP_DEP",
-      "ACCOUNTANT",
-      "CASHIER",
-      "DEPUTY",
-    ])
-  )
-    return;
+  if (!req.session.checkRole(req, res, ["ANALYST", "HEAD_OP_DEP"])) return;
 
   let data = {
     queryLength: 0,
@@ -23,7 +15,7 @@ router.get("/getMain", async function (req, res, next) {
 
   let perPage = Number(req.query?.perPage || MAX_PAGE_SIZE);
   let currentPage = Number(req.query?.currentPage || START_PAGE);
-  let searchQuery = req.query?.searchQuery || "";
+
   let apv = {};
   let krug = {};
   let brigs = {};

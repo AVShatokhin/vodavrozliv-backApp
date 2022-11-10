@@ -3,15 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get("/getMainJouFilterStructure", async function (req, res, next) {
-  if (
-    !req.session.checkRole(req, res, [
-      "HEAD_ANALYSTOP_DEP",
-      "ACCOUNTANT",
-      "CASHIER",
-      "DEPUTY",
-    ])
-  )
-    return;
+  if (!req.session.checkRole(req, res, ["ANALYST", "HEAD_OP_DEP"])) return;
 
   let structure = {
     // apvs: {},

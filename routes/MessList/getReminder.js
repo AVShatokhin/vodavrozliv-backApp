@@ -3,8 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get("/getReminder", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["DEPUTY", "HEAD_OP_DEP", "PROGRAMMER"]))
-    return;
+  if (!req.session.checkRole(req, res, ["ANALYST", "PROGRAMMER"])) return;
 
   await req.mysqlConnection
     .asyncQuery(req.mysqlConnection.SQL_APP.getReminder, ["Reminder"])

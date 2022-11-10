@@ -6,7 +6,7 @@ const START_PAGE = 0;
 
 /* GET home page. */
 router.get("/getKrug", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["HEAD_OP_DEP", "DEPUTY"])) return;
+  if (!req.session.checkRole(req, res, ["HEAD_OP_DEP", "ANALYST"])) return;
 
   let data = {
     queryLength: 0,

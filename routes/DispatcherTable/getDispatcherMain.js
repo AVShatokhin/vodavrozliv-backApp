@@ -7,7 +7,7 @@ const SELL_HOURS = 18;
 
 /* GET home page. */
 router.post("/getDispatcherMain", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["DISPATCHER"])) return;
+  if (!req.session.checkRole(req, res, ["DISPATCHER", "HEAD_OP_DEP"])) return;
 
   let __requestData = req.body.requestData;
   let __currentPage = req.body.currentPage || START_PAGE;

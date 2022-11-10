@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get("/getAllErrorsAndDevices", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["ANALYST"])) return;
+  if (!req.session.checkRole(req, res, ["ANALYST", "HEAD_OP_DEP"])) return;
 
   let errorsModel = await req.mysqlConnection
     .asyncQuery(req.mysqlConnection.SQL_APP.getErrorsNormal, [])

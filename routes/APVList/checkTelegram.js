@@ -4,7 +4,7 @@ const { Telegraf } = require("telegraf");
 
 /* GET home page. */
 router.post("/checkTelegram", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["DEPUTY", "HEAD_OP_DEP"])) return;
+  if (!req.session.checkRole(req, res, ["ANALYST", "HEAD_OP_DEP"])) return;
 
   let token = req.config.botToken;
   const bot = new Telegraf(token);

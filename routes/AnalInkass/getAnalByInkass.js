@@ -19,8 +19,6 @@ router.get("/getAnalByInkass", async function (req, res, next) {
 
   let requestData = JSON.parse(req.query.requestData);
 
-  let __dateCreationFrom = FROM_SECONDS(requestData.dateCreationFrom / 1000);
-  let __dateCreationTo = FROM_SECONDS(requestData.dateCreationTo / 1000);
   let __dateInkassFrom = FROM_SECONDS(requestData.dateInkassFrom / 1000);
   let __dateInkassTo = FROM_SECONDS(requestData.dateInkassTo / 1000);
   let __apvs = requestData.apvs;

@@ -6,7 +6,7 @@ const START_PAGE = 0;
 
 /* GET home page. */
 router.post("/addAPV", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["DEPUTY", "HEAD_OP_DEP"])) return;
+  if (!req.session.checkRole(req, res, ["ANALYST", "HEAD_OP_DEP"])) return;
 
   await req.mysqlConnection
     .asyncQuery(req.mysqlConnection.SQL_APP.addAPV, [

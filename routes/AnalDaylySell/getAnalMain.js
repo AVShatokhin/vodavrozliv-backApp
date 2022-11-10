@@ -7,7 +7,8 @@ const SELL_HOURS = 18;
 
 /* GET home page. */
 router.post("/getAnalMain", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["ANALYST"])) return;
+  if (!req.session.checkRole(req, res, ["ANALYST", "DISPATCHER", "ACCOUNTANT"]))
+    return;
 
   let __requestData = req.body.requestData;
   let __currentPage = req.body.currentPage || START_PAGE;

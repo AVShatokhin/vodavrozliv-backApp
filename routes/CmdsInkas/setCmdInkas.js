@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.post("/setCmdInkas", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["ACCOUNTANT"])) return;
+  if (!req.session.checkRole(req, res, ["ANALYST"])) return;
 
   let cmdProfile = { userData: req.session.userData, cmd: req.body.cmd };
 

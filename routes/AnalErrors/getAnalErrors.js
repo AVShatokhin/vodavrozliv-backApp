@@ -7,7 +7,7 @@ const START_PAGE = 0;
 
 /* GET home page. */
 router.get("/getAnalErrors", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["ANALYST"])) return;
+  if (!req.session.checkRole(req, res, ["ANALYST", "HEAD_OP_DEP"])) return;
 
   let data = {
     queryLength: 0,

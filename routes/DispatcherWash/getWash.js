@@ -7,7 +7,7 @@ const START_PAGE = 0;
 
 /* GET home page. */
 router.get("/getWash", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["ANALYST"])) return;
+  if (!req.session.checkRole(req, res, ["DISPATCHER", "HEAD_OP_DEP"])) return;
 
   let data = {
     queryLength: 0,

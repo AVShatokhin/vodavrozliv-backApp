@@ -6,16 +6,7 @@ const START_PAGE = 0;
 
 /* GET home page. */
 router.get("/getCashierInkass", async function (req, res, next) {
-  if (
-    !req.session.checkRole(req, res, [
-      "ENGINEER",
-      "CASHIER",
-      "ACCOUNTANT",
-      "HEAD_ANALYSTOP_DEP",
-      "DEPUTY",
-    ])
-  )
-    return;
+  if (!req.session.checkRole(req, res, ["CASHIER"])) return;
 
   let data = {
     queryLength: 0,

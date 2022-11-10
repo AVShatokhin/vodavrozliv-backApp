@@ -3,7 +3,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get("/getApvForInkas", async function (req, res, next) {
-  if (!req.session.checkRole(req, res, ["ACCOUNTANT"])) return;
+  if (!req.session.checkRole(req, res, ["ANALYST"])) return;
 
   await req.mysqlConnection
     .asyncQuery(req.mysqlConnection.SQL_APP.getApvForInkas, [])

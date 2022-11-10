@@ -8,7 +8,6 @@ router.get("/getSnSelectorData", async function (req, res, next) {
       "ANALYST",
       "ACCOUNTANT",
       "CASHIER",
-      "DEPUTY",
       "HEAD_OP_DEP",
       "ENGINEER",
       "PROGRAMMER",
