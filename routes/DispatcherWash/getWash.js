@@ -23,6 +23,8 @@ router.get("/getWash", async function (req, res, next) {
   let __dateTo = requestData.dateTo / 1000;
   let __i = 0;
 
+  let __loadXML = req.query?.loadXML;
+
   let __dates = {};
 
   while (__dateFrom + __i * 24 * 3600 < __dateTo) {
@@ -99,23 +101,22 @@ router.get("/getWash", async function (req, res, next) {
 
   data.queryLength = __unPagedArray.length;
 
-  // if (__loadXML) {
-  //   data.items = __unPagedArray;
-  // } else {
-  let __pagedArray = [];
+  if (__loadXML) {
+    data.items = __unPagedArray;
+  } else {
+    let __pagedArray = [];
 
-  for (const [index, element] of __unPagedArray.entries()) {
-    if (
-      (index >= __currentPage * __perPage) &
-      (index < (__currentPage + 1) * __perPage)
-    ) {
-      __pagedArray.push(element);
+    for (const [index, element] of __unPagedArray.entries()) {
+      if (
+        (index >= __currentPage * __perPage) &
+        (index < (__currentPage + 1) * __perPage)
+      ) {
+        __pagedArray.push(element);
+      }
     }
+
+    data.items = __pagedArray;
   }
-
-  data.items = __pagedArray;
-
-  // }
 
   data.apvs = apvs;
   res.result.data = data;

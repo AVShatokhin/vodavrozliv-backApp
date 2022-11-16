@@ -95,24 +95,29 @@ let getBuhReportPoditog = (apvs) => {
 };
 
 let getBuhReport = (apvs) => {
-  return `SELECT delta.sn, date, eq, nal, tSOLD, w, address FROM delta LEFT JOIN apv ON apv.sn = delta.sn WHERE ${sqlFromArray(
-    "sn",
+  return `SELECT delta.sn as sn, sum(eq) as eq, sum(nal) as nal, sum(tSOLD) as tSOLD, sum(w) as w, address FROM delta LEFT JOIN apv ON apv.sn = delta.sn WHERE ${sqlFromArray(
+    "delta.sn",
     apvs
-  )} and date BETWEEN ? AND ? ORDER BY date DESC, delta.sn LIMIT ?, ?`;
+  )} and date BETWEEN ? AND ? 
+  GROUP BY delta.sn 
+  ORDER BY date DESC, delta.sn 
+  LIMIT ?, ?`;
 };
 
 let getBuhReportCount = (apvs) => {
-  return `SELECT count(*) as queryLength FROM delta WHERE ${sqlFromArray(
+  return `SELECT DISTINCT count(sn) as queryLength FROM delta WHERE ${sqlFromArray(
     "sn",
     apvs
   )} and date BETWEEN ? AND ?`;
 };
 
 let getBuhReportUnlim = (apvs) => {
-  return `SELECT delta.sn, date, eq, nal, tSOLD, w, address FROM delta LEFT JOIN apv ON apv.sn = delta.sn WHERE ${sqlFromArray(
-    "sn",
+  return `SELECT delta.sn as sn, sum(eq) as eq, sum(nal) as nal, sum(tSOLD) as tSOLD, sum(w) as w, address FROM delta LEFT JOIN apv ON apv.sn = delta.sn WHERE ${sqlFromArray(
+    "delta.sn",
     apvs
-  )} and date BETWEEN ? AND ? ORDER BY date DESC, delta.sn`;
+  )} and date BETWEEN ? AND ? 
+  GROUP BY delta.sn 
+  ORDER BY date DESC, delta.sn`;
 };
 
 let getBuhActuals = (apvs) => {
@@ -199,7 +204,7 @@ let getCashierInkass = (requestData) => {
   let __order = "";
 
   if (requestData.sortType == 0) {
-    __order = "order by dateCreation desc";
+    __order = "order by lts desc";
   } else if (requestData.sortType == 1) {
     __order = "order by dateInkass desc";
   } else if (requestData.sortType == 2) {
