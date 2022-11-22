@@ -208,7 +208,7 @@ let getCashierInkass = (requestData) => {
   } else if (requestData.sortType == 1) {
     __order = "order by dateInkass desc";
   } else if (requestData.sortType == 2) {
-    __order = "order by sn, dateInkass";
+    __order = "order by cashier_inkass.sn, dateInkass";
   } else if (requestData.sortType == 3) {
     __order = "order by summ";
   } else if (requestData.sortType == 4) {
@@ -221,7 +221,10 @@ let getCashierInkass = (requestData) => {
     requestData?.useCreationDate ? 0 : 1
   }) and ((dateInkass BETWEEN ? AND ?) OR ${
     requestData?.useInkassDate ? 0 : 1
-  }) AND ${sqlFromArray("sn", requestData.apvs)} ${__order} LIMIT ?, ?`;
+  }) AND ${sqlFromArray(
+    "cashier_inkass.sn",
+    requestData.apvs
+  )} ${__order} LIMIT ?, ?`;
 };
 
 let getCashierInkassPodItog = (requestData) => {
