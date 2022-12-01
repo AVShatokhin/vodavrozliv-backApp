@@ -15,10 +15,11 @@ router.post("/checkTelegram", async function (req, res, next) {
       async (result) => {
         if (result[0]?.tgLink) {
           try {
-            await bot.telegram.sendMessage(
-              `@${result[0]?.tgLink}`,
+            let ans = await bot.telegram.sendMessage(
+              `${result[0].tgLink}`,
               `${req.body.sn} : Проверка связи!`
             );
+            res.result["chat_id"] = ans.chat.id;
             res.ok();
           } catch (e) {
             res.error("TELEGRAM_ERROR", e?.response?.description);
