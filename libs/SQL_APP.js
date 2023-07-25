@@ -4,7 +4,6 @@ module.exports = (config) => {
   _config = config;
 
   return {
-    Test: `SELECT test from test`,
     getAPV: `SELECT sn, a, address, activeKrug, tgLink, snEQ, cost, phone, version, linkState, oper, lts from apv WHERE sn like CONCAT('%',?,'%') or address like CONCAT('%',?,'%') or oper like CONCAT('%',?,'%') or phone like CONCAT('%',?,'%') or snEQ like CONCAT('%',?,'%') order by sn LIMIT ?, ?`,
     getAPVCount: `SELECT count(*) as queryLength from apv WHERE sn like CONCAT('%',?,'%') or address like CONCAT('%',?,'%') or phone like CONCAT('%',?,'%') or oper like CONCAT('%',?,'%') or snEQ like CONCAT('%',?,'%')`,
     getAllAPV: `SELECT sn, address, activeKrug, a from apv`,
