@@ -5,6 +5,7 @@ module.exports = (config) => {
 
   return {
     getAPV: `SELECT sn, a, address, activeKrug, tgLink, snEQ, cost, phone, version, linkState, oper, lts from apv WHERE sn like CONCAT('%',?,'%') or address like CONCAT('%',?,'%') or oper like CONCAT('%',?,'%') or phone like CONCAT('%',?,'%') or snEQ like CONCAT('%',?,'%') order by sn LIMIT ?, ?`,
+    getAPV_XML: `SELECT sn, a, address, activeKrug, tgLink, snEQ, cost, phone, version, linkState, oper, lts from apv WHERE sn like CONCAT('%',?,'%') or address like CONCAT('%',?,'%') or oper like CONCAT('%',?,'%') or phone like CONCAT('%',?,'%') or snEQ like CONCAT('%',?,'%') order by sn`,
     getAPVCount: `SELECT count(*) as queryLength from apv WHERE sn like CONCAT('%',?,'%') or address like CONCAT('%',?,'%') or phone like CONCAT('%',?,'%') or oper like CONCAT('%',?,'%') or snEQ like CONCAT('%',?,'%')`,
     getAllAPV: `SELECT sn, address, activeKrug, a from apv`,
     getTGLink: `SELECT tgLink from apv where sn=?`,
@@ -29,8 +30,10 @@ module.exports = (config) => {
     updateMembersInBrig: `UPDATE brig SET brigMembers=? where brig_id=?`,
     updateBrig: `UPDATE brig SET brigName=?, brigCar=?, brigKey=?, brigPhone=? where brig_id=?`,
     getInkas,
+    getInkas_XML,
     getInkasCount,
     getMain,
+    getMain_XML,
     getMainCount,
     getDevices: `SELECT errorDevice, deviceName from device`,
     getErrors: `SELECT errorCode, errorText, isActive from error`,
@@ -161,6 +164,18 @@ let getInkas = (apvs) => {
   ORDER BY inkas.lts DESC LIMIT ?, ?`;
 };
 
+let getInkas_XML = (apvs) => {
+  return `SELECT brig.brigName, dateUnique, inkas_id, inkas.sn as sn, inkas_number, 
+  inkas.lts as lts, date, inkas.version as version, inkas, kup, box, op, op_extended, op_state, 
+  rd, inkas.address, inkas.krug_name 
+  from inkas 
+  LEFT JOIN apv ON apv.sn = inkas.sn 
+  LEFT JOIN krug ON apv.activeKrug=krug.krug_id 
+  LEFT JOIN brig ON krug.brig_id=brig.brig_id
+  WHERE ${sqlFromArray("inkas.sn", apvs)} AND DATE(inkas.lts) BETWEEN ? AND ? 
+  ORDER BY inkas.lts DESC`;
+};
+
 let getInkasCount = (apvs) => {
   return `SELECT count(*) as queryLength from inkas WHERE ${sqlFromArray(
     "sn",
@@ -250,6 +265,12 @@ let getMain = (requestData) => {
   )} order by lts desc LIMIT ?, ?`;
 };
 
+let getMain_XML = (requestData) => {
+  return `SELECT sn, version, lts, FLAG_start, w, k, r, m, m1, m2, m5, m10, c, f, errorDevice, errorCode, messCode, FLAG_k_off, FLAG_m_off, FLAG_c_off, FLAG_r_off, FLAG_error_m1, FLAG_error_m2, FLAG_error_m5, FLAG_error_m10, v1, v2, v3, v4, FLAG_t_off, dv1, dv2, dv3, dv4, dv5, tSOLD, tREMAIN, FLAG_f_off from main where (lts between ? and ?) and ${calcSqlWhereForMain(
+    requestData
+  )} order by lts desc`;
+};
+
 let getMainCount = (requestData) => {
   return `SELECT count(*) as queryLength from main where (lts between ? and ?) and ${calcSqlWhereForMain(
     requestData
@@ -260,10 +281,10 @@ let calcSqlWhereForMain = (requestData) => {
   return `${sqlFromArray("sn", requestData.apvs)} and ${sqlFromArray(
     "errorCode",
     requestData.errors
-  )} and ${sqlFromArray("errorDevice", requestData.devices)} and ${sqlFromArray(
-    "messCode",
-    requestData.messages
-  )}`;
+  )} and ${sqlJSONFromArray(
+    "errorDevice",
+    requestData.devices
+  )} and ${sqlJSONFromArray("messCode", requestData.messages)}`;
 };
 
 let sqlFromArray = (column, array, defaultV) => {
@@ -271,6 +292,19 @@ let sqlFromArray = (column, array, defaultV) => {
   if (array?.length > 0) {
     array.forEach((value) => {
       __processingArray.push(` ${column}="${value}" `);
+    });
+
+    return "(" + __processingArray.join("or") + ")";
+  } else {
+    return defaultV || "1";
+  }
+};
+
+let sqlJSONFromArray = (column, array, defaultV) => {
+  let __processingArray = [];
+  if (array?.length > 0) {
+    array.forEach((value) => {
+      __processingArray.push(` (${column} like \'%\"${value}\"%\') `);
     });
 
     return "(" + __processingArray.join("or") + ")";

@@ -6,12 +6,10 @@ const START_PAGE = 0;
 const SELL_HOURS = 18;
 
 /* GET home page. */
-router.post("/getDispatcherMain", async function (req, res, next) {
+router.post("/getDispatcherMain_XML", async function (req, res, next) {
   if (!req.session.checkRole(req, res, ["DISPATCHER", "HEAD_OP_DEP"])) return;
 
   let __requestData = req.body.requestData;
-  let __currentPage = req.body.currentPage || START_PAGE;
-  let __perPage = req.body.perPage || MAX_PAGE_SIZE;
 
   let data = {
     queryLength: 0,
@@ -95,22 +93,20 @@ router.post("/getDispatcherMain", async function (req, res, next) {
     });
   }
 
-  let __pagedApvsArray = [];
+  // let __pagedApvsArray = [];
 
-  for (const [index, element] of __apvsArray.entries()) {
-    if (
-      (index >= __currentPage * __perPage) &
-      (index < (__currentPage + 1) * __perPage)
-    ) {
-      __pagedApvsArray.push(element);
-    }
-  }
+  // for (const [index, element] of __apvsArray.entries()) {
+  //   if (
+  //     (index >= __currentPage * __perPage) &
+  //     (index < (__currentPage + 1) * __perPage)
+  //   ) {
+  //     __pagedApvsArray.push(element);
+  //   }
+  // }
 
   data.queryLength = __apvsArray.length;
-  data.apvs = __pagedApvsArray;
+  data.apvs = __apvsArray;
   res.result.data = data;
-
-  // console.log(data.apvs);
 
   res.ok();
 });

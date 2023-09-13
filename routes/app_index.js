@@ -68,6 +68,7 @@ var delCashierInkass = require("./CashierInkass/delCashierInkass");
 
 module.exports = [
   getAPV,
+  require("./APVList/getAPV_XML"),
   addAPV,
   deleteAPV,
   updateApvOptions,
@@ -87,7 +88,9 @@ module.exports = [
   deleteEngFromBrig,
   updateBrig,
   getInkas,
+  require("./InkasJou/getInkas_XML"),
   getMain,
+  require("./MainJou/getMain_XML"),
   getDevices,
   getErrors,
   getMessages,
@@ -112,6 +115,7 @@ module.exports = [
   applyReminder,
   getReminder,
   getDispatcherMain,
+  require("./DispatcherTable/getDispatcherMain_XML"),
   getAnalMain,
   getSnSelectorData,
   getCashierInkass,
