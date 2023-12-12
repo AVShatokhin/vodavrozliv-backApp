@@ -7,6 +7,7 @@ router.post("/addWashApv", async function (req, res, next) {
 
   let __date = FROM_SECONDS(req.body.data.date);
   let __sn = req.body.data.sn;
+  let __user = req.body.data.user;
   let __comment = req.body.data.comment;
 
   let __washObject = await req.mysqlConnection
@@ -25,7 +26,7 @@ router.post("/addWashApv", async function (req, res, next) {
     );
 
   if (__washObject?.[__sn] == null) {
-    __washObject[__sn] = { sn: __sn, comment: __comment };
+    __washObject[__sn] = { sn: __sn, comment: __comment, user: __user };
 
     await req.mysqlConnection
       .asyncQuery(req.mysqlConnection.SQL_APP.updateWash, [

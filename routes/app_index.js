@@ -134,6 +134,7 @@ module.exports = [
   require("./DispatcherWash/getWash"),
   require("./DispatcherWash/addWashApv"),
   require("./DispatcherWash/delWashApv"),
+  require("./DispatcherWash/getAllWashers"),
   require("./BuhActual/getBuhActual"),
   require("./BuhReport/getBuhReport"),
 ];

@@ -20,6 +20,7 @@ module.exports = (config) => {
     deleteKrug: `DELETE from krug WHERE krug_id=?`,
     changeKrugTitle: `UPDATE krug SET title=? where krug_id=?`,
     getAllEngs: `SELECT uid, extended, email  FROM ${config.db_prefix}_users WHERE roles like CONCAT('%',?,'%') order by uid`,
+    getAllWashers: `SELECT uid, extended, email  FROM ${config.db_prefix}_users WHERE roles like CONCAT('%',?,'%') order by uid`,
     changeBrigKrug: `UPDATE krug set brig_id=? where krug_id=?`,
     addBrig: `INSERT INTO brig set brigName=?, brigCar=?, brigKey=?, brigPhone=?`,
     getBrig: `SELECT brig_id, brigName, brigCar, brigMembers, brigKey, brigPhone FROM brig WHERE brigName like CONCAT('%',?,'%') or brigCar like CONCAT('%',?,'%') or brigKey like CONCAT('%',?,'%') or brigPhone like CONCAT('%',?,'%') order by brig_id LIMIT ?, ?`,
