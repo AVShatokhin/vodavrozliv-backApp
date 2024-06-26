@@ -133,6 +133,7 @@ module.exports = [
   require("./AnalInkass/setPrihodAll"),
   require("./DispatcherWash/getWash"),
   require("./DispatcherWash/addWashApv"),
+  require("./DispatcherWash/editWashApv"),
   require("./DispatcherWash/delWashApv"),
   require("./DispatcherWash/getAllWashers"),
   require("./BuhActual/getBuhActual"),

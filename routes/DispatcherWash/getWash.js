@@ -77,28 +77,6 @@ router.get("/getWash", async function (req, res, next) {
       });
     });
 
-  // switch (requestData.sortType) {
-  //   case 0: // startLts
-  //     __unPagedArray = problems.sort((a, b) => {
-  //       return a.startLts <= b.startLts ? 1 : -1;
-  //     });
-  //     break;
-  //   case 1: // sn
-  //     __unPagedArray = problems.sort((a, b) => {
-  //       return a.sn > b.sn ? 1 : -1;
-  //     });
-  //     break;
-  //   case 2: // long
-  //     __unPagedArray = problems.sort((a, b) => {
-  //       if (a.startLts == a.stopLts) return -1;
-  //       return a.long < b.long ? 1 : -1;
-  //     });
-  //     break;
-
-  //   default:
-  //     break;
-  // }
-
   data.queryLength = __unPagedArray.length;
 
   if (__loadXML) {

@@ -282,7 +282,7 @@ let calcSqlWhereForMain = (requestData) => {
   return `${sqlFromArray("sn", requestData.apvs)} and ${sqlFromArray(
     "errorCode",
     requestData.errors
-  )} and ${sqlJSONFromArray(
+  )} and ${sqlFromArray(
     "errorDevice",
     requestData.devices
   )} and ${sqlJSONFromArray("messCode", requestData.messages)}`;
