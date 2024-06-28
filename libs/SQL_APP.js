@@ -87,7 +87,31 @@ module.exports = (config) => {
     getBuhReportCount,
     getBuhReportUnlim,
     getBuhReportPoditog,
+    getDispatcherHistory,
+    getDispatcherHistoryCount,
+    getDispatcherHistory_XML,
   };
+};
+
+let getDispatcherHistory_XML = (apvs) => {
+  return `SELECT lts, sn, w, v1, v2, v3, v4, chargeObject, dv1, dv2, dv3, dv4, dv5, errorDevice, errorCode FROM main_disp WHERE ${sqlFromArray(
+    "sn",
+    apvs
+  )} and date(lts) BETWEEN ? AND ? ORDER BY lts DESC`;
+};
+
+let getDispatcherHistory = (apvs) => {
+  return `SELECT lts, sn, w, v1, v2, v3, v4, chargeObject, dv1, dv2, dv3, dv4, dv5, errorDevice, errorCode FROM main_disp WHERE ${sqlFromArray(
+    "sn",
+    apvs
+  )} and date(lts) BETWEEN ? AND ? ORDER BY lts DESC LIMIT ?, ?`;
+};
+
+let getDispatcherHistoryCount = (apvs) => {
+  return `SELECT count(*) as queryLength FROM main_disp where ${sqlFromArray(
+    "sn",
+    apvs
+  )} and date(lts) BETWEEN ? AND ?`;
 };
 
 let getBuhReportPoditog = (apvs) => {
