@@ -20,13 +20,15 @@ router.get("/getBuhActual", async function (req, res, next) {
 
   let __apvs = requestData.apvs;
   let __loadXML = req.query?.loadXML;
+  let __sortType = requestData?.sortType || 0;
 
-  let __unPagedArray = await req.mysqlConnection
+  let __rawUnPagedArray = await req.mysqlConnection
     .asyncQuery(req.mysqlConnection.SQL_APP.getBuhActuals(__apvs), [])
     .then(
       (result) => {
         result.forEach((e) => {
           e.value = JSON.parse(e.value);
+          e.nal = Number(e.value?.k || 0) + Number(e.value?.m || 0);
         });
         return result;
       },
@@ -35,27 +37,28 @@ router.get("/getBuhActual", async function (req, res, next) {
       }
     );
 
-  // switch (requestData.sortType) {
-  //   case 0: // startLts
-  //     __unPagedArray = problems.sort((a, b) => {
-  //       return a.startLts <= b.startLts ? 1 : -1;
-  //     });
-  //     break;
-  //   case 1: // sn
-  //     __unPagedArray = problems.sort((a, b) => {
-  //       return a.sn > b.sn ? 1 : -1;
-  //     });
-  //     break;
-  //   case 2: // long
-  //     __unPagedArray = problems.sort((a, b) => {
-  //       if (a.startLts == a.stopLts) return -1;
-  //       return a.long < b.long ? 1 : -1;
-  //     });
-  //     break;
+  let __unPagedArray = [];
 
-  //   default:
-  //     break;
-  // }
+  switch (__sortType) {
+    case 0: // sn
+      __unPagedArray = __rawUnPagedArray.sort((a, b) => {
+        return a.sn > b.sn ? 1 : -1;
+      });
+      break;
+    case 1: // low
+      __unPagedArray = __rawUnPagedArray.sort((a, b) => {
+        return a.nal < b.nal ? 1 : -1;
+      });
+      break;
+    case 2: // rise
+      __unPagedArray = __rawUnPagedArray.sort((a, b) => {
+        return a.nal >= b.nal ? 1 : -1;
+      });
+      break;
+
+    default:
+      break;
+  }
 
   data.queryLength = __unPagedArray.length;
 

@@ -13,7 +13,9 @@ router.post("/getAnalMain", async function (req, res, next) {
   let __requestData = req.body.requestData;
   let __currentPage = req.body.currentPage || START_PAGE;
   let __perPage = req.body.perPage || MAX_PAGE_SIZE;
-  // let __sortType = __requestData?.sortType;
+  let __sortType = __requestData?.sortType || 0;
+
+  console.log(__sortType);
 
   let data = {
     queryLength: 0,
@@ -27,12 +29,13 @@ router.post("/getAnalMain", async function (req, res, next) {
         let __apvs = {};
 
         result.forEach((e) => {
-          e.chargeInfo = JSON.parse(e.chargeInfo);
-          e.data = JSON.parse(e.data);
-          e.online = e.online == 1;
+          // e.chargeInfo = JSON.parse(e.chargeInfo);
+          // e.data = JSON.parse(e.data);
+          // e.online = e.online == 1;
           __apvs[e.sn] = e;
           __apvs[e.sn].AVGDaylySell = 0;
           __apvs[e.sn].AVGHourlySell = 0;
+          __apvs[e.sn].AVGMonthlySell = 0;
         });
 
         return __apvs;
@@ -44,18 +47,39 @@ router.post("/getAnalMain", async function (req, res, next) {
       }
     );
 
-  await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getAllAVGDaylySell, [])
+  let __apvsArray = await req.mysqlConnection
+    .asyncQuery(req.mysqlConnection.SQL_APP.getAllAVGDaylySell(__sortType), [])
     .then(
       (result) => {
+        let __resultSells = [];
+
         result.forEach((avg) => {
           let __avgDaylySEll = (avg?.AVGDaylySell || 0).toFixed(1);
           let __avgHourly = (__avgDaylySEll / SELL_HOURS || 0).toFixed(1);
-          if (apvs?.[avg.sn]) {
-            apvs[avg.sn].AVGDaylySell = __avgDaylySEll;
-            apvs[avg.sn].AVGHourlySell = __avgHourly;
+          let __avgMonthly = (__avgDaylySEll * 30 || 0).toFixed(1);
+
+          if (
+            apvs?.[avg.sn] &&
+            (__requestData.apvs.includes(avg.sn) ||
+              __requestData.apvs.length == 0)
+          ) {
+            __resultSells.push({
+              AVGDaylySell: __avgDaylySEll,
+              AVGHourlySell: __avgHourly,
+              AVGMonthlySell: __avgMonthly,
+              address: apvs[avg.sn].address,
+              sn: avg.sn,
+            });
           }
+
+          // if (apvs?.[avg.sn]) {
+          //   apvs[avg.sn].AVGDaylySell = __avgDaylySEll;
+          //   apvs[avg.sn].AVGHourlySell = __avgHourly;
+          //   apvs[avg.sn].AVGMonthlySell = __avgMonthly;
+          // }
         });
+
+        return __resultSells;
       },
       (err) => {
         res.error("SQL", err);
@@ -64,15 +88,15 @@ router.post("/getAnalMain", async function (req, res, next) {
       }
     );
 
-  if (__requestData.apvs.length > 0) {
-    let __newApvs = {};
-    __requestData.apvs.forEach((apv) => {
-      if (apvs[apv] != undefined) __newApvs[apv] = apvs[apv];
-    });
-    apvs = __newApvs;
-  }
+  // if (__requestData.apvs.length > 0) {
+  //   let __newApvs = {};
+  //   __requestData.apvs.forEach((apv) => {
+  //     if (apvs[apv] != undefined) __newApvs[apv] = apvs[apv];
+  //   });
+  //   apvs = __newApvs;
+  // }
 
-  let __apvsArray = Object.values(apvs);
+  // let __apvsArray = Object.values(apvs);
 
   // if (__sortType == 0) {
   //   __apvsArray = __apvsArray.sort((a, b) => {

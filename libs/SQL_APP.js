@@ -59,7 +59,7 @@ module.exports = (config) => {
     getReminder: `SELECT value FROM kvs WHERE link=?`,
     applyReminder: `REPLACE INTO kvs SET link=?, value=?`,
     getAllCurrentApvData: `SELECT kvs.lts, link as sn, value as data, apv.chargeInfo, address, online FROM kvs, apv WHERE apv.sn = kvs.link`,
-    getAllAVGDaylySell: `SELECT sn, AVG(daylySellValue) as AVGDaylySell FROM dayly_stats WHERE date BETWEEN DATE_SUB(DATE(now()), INTERVAL 1 MONTH) AND DATE(now()) group by sn`,
+    getAllAVGDaylySell,
     getCashierInkass,
     getCashierInkassCount,
     getCashierInkassPodItog,
@@ -93,6 +93,23 @@ module.exports = (config) => {
   };
 };
 
+let getAllAVGDaylySell = (sortType) => {
+  switch (sortType) {
+    case 0:
+      return `SELECT sn, AVG(daylySellValue) as AVGDaylySell FROM dayly_stats WHERE date BETWEEN DATE_SUB(DATE(now()), INTERVAL 1 MONTH) AND DATE(now()) group by sn order by sn`;
+      break;
+    case 1:
+      return `SELECT sn, AVG(daylySellValue) as AVGDaylySell FROM dayly_stats WHERE date BETWEEN DATE_SUB(DATE(now()), INTERVAL 1 MONTH) AND DATE(now()) group by sn order by AVGDaylySell desc`;
+      break;
+    case 2:
+      return `SELECT sn, AVG(daylySellValue) as AVGDaylySell FROM dayly_stats WHERE date BETWEEN DATE_SUB(DATE(now()), INTERVAL 1 MONTH) AND DATE(now()) group by sn order by AVGDaylySell`;
+      break;
+    default:
+      return `SELECT sn, AVG(daylySellValue) as AVGDaylySell FROM dayly_stats WHERE date BETWEEN DATE_SUB(DATE(now()), INTERVAL 1 MONTH) AND DATE(now()) group by sn order by sn`;
+      break;
+  }
+};
+
 let getDispatcherHistory_XML = (apvs) => {
   return `SELECT lts, sn, w, v1, v2, v3, v4, chargeObject, dv1, dv2, dv3, dv4, dv5, errorDevice, errorCode FROM main_disp WHERE ${sqlFromArray(
     "sn",
@@ -121,30 +138,46 @@ let getBuhReportPoditog = (apvs) => {
   )} and date BETWEEN ? AND ?`;
 };
 
-let getBuhReport = (apvs) => {
+let getBuhReport = (apvs, sortType) => {
+  let __order = "delta.sn";
+
+  if (sortType == 1) {
+    __order = "w DESC";
+  } else if (sortType == 2) {
+    __order = "w";
+  }
+
   return `SELECT delta.sn as sn, sum(eq) as eq, sum(nal) as nal, sum(tSOLD) as tSOLD, sum(w) as w, address FROM delta LEFT JOIN apv ON apv.sn = delta.sn WHERE ${sqlFromArray(
     "delta.sn",
     apvs
   )} and date BETWEEN ? AND ? 
   GROUP BY delta.sn 
-  ORDER BY date DESC, delta.sn 
+  ORDER BY date DESC, ${__order}
   LIMIT ?, ?`;
 };
 
 let getBuhReportCount = (apvs) => {
-  return `SELECT DISTINCT count(sn) as queryLength FROM delta WHERE ${sqlFromArray(
+  return `SELECT count(DISTINCT sn) as queryLength FROM delta WHERE ${sqlFromArray(
     "sn",
     apvs
   )} and date BETWEEN ? AND ?`;
 };
 
-let getBuhReportUnlim = (apvs) => {
+let getBuhReportUnlim = (apvs, sortType) => {
+  let __order = "delta.sn";
+
+  if (sortType == 1) {
+    __order = "w DESC";
+  } else if (sortType == 2) {
+    __order = "w";
+  }
+
   return `SELECT delta.sn as sn, sum(eq) as eq, sum(nal) as nal, sum(tSOLD) as tSOLD, sum(w) as w, address FROM delta LEFT JOIN apv ON apv.sn = delta.sn WHERE ${sqlFromArray(
     "delta.sn",
     apvs
   )} and date BETWEEN ? AND ? 
   GROUP BY delta.sn 
-  ORDER BY date DESC, delta.sn`;
+  ORDER BY date DESC, ${__order}`;
 };
 
 let getBuhActuals = (apvs) => {

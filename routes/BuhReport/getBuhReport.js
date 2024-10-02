@@ -23,6 +23,7 @@ router.get("/getBuhReport", async function (req, res, next) {
   let __dateFrom = FROM_SECONDS(requestData.dateFrom / 1000);
   let __dateTo = FROM_SECONDS(requestData.dateTo / 1000);
   let __apvs = requestData.apvs;
+  let __sortType = requestData?.sortType || 0;
 
   let __loadXML = req.query?.loadXML;
 
@@ -46,10 +47,10 @@ router.get("/getBuhReport", async function (req, res, next) {
 
   if (__loadXML) {
     data.items = await req.mysqlConnection
-      .asyncQuery(req.mysqlConnection.SQL_APP.getBuhReportUnlim(__apvs), [
-        __dateFrom,
-        __dateTo,
-      ])
+      .asyncQuery(
+        req.mysqlConnection.SQL_APP.getBuhReportUnlim(__apvs, __sortType),
+        [__dateFrom, __dateTo]
+      )
       .then(
         (result) => {
           return result;
@@ -78,12 +79,10 @@ router.get("/getBuhReport", async function (req, res, next) {
       );
 
     data.items = await req.mysqlConnection
-      .asyncQuery(req.mysqlConnection.SQL_APP.getBuhReport(__apvs), [
-        __dateFrom,
-        __dateTo,
-        __currentPage * __perPage,
-        __perPage,
-      ])
+      .asyncQuery(
+        req.mysqlConnection.SQL_APP.getBuhReport(__apvs, __sortType),
+        [__dateFrom, __dateTo, __currentPage * __perPage, __perPage]
+      )
       .then(
         (result) => {
           return result;
