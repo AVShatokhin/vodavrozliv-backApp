@@ -18,6 +18,8 @@ let commands = {
   "mon:off": "Выкл монет",
   "rd:on": "Вкл б/н",
   "rd:off": "Выкл б/н",
+  "san:on": "Вкл санитарную обработку",
+  "san:off": "Выкл санитарную обработку",
   "alarm:off": "Выключить сигнализацию",
 };
 
@@ -26,7 +28,6 @@ router.post("/setCmdByEng", async function (req, res, next) {
   if (!req.session.checkRole(req, res, ["ENGINEER"])) return;
 
   let cmdProfile = { userData: req.session.userData, cmd: req.body.cmd };
-
   let token = req.config.botToken;
   const bot = new Telegraf(token);
 
