@@ -42,7 +42,7 @@ router.post("/getDispatcherMain_XML", async function (req, res, next) {
     );
 
   await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getAllAVGDaylySell, [])
+    .asyncQuery(req.mysqlConnection.SQL_APP.getAllAVGDaylySell(0), [])
     .then(
       (result) => {
         result.forEach((avg) => {

@@ -13,6 +13,8 @@ router.post("/getDispatcherMain", async function (req, res, next) {
   let __currentPage = req.body.currentPage || START_PAGE;
   let __perPage = req.body.perPage || MAX_PAGE_SIZE;
 
+  console.log("dsfsdf");
+
   let data = {
     queryLength: 0,
     apvs: [],
@@ -44,7 +46,7 @@ router.post("/getDispatcherMain", async function (req, res, next) {
     );
 
   await req.mysqlConnection
-    .asyncQuery(req.mysqlConnection.SQL_APP.getAllAVGDaylySell, [])
+    .asyncQuery(req.mysqlConnection.SQL_APP.getAllAVGDaylySell(0), [])
     .then(
       (result) => {
         result.forEach((avg) => {
